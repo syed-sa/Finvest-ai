@@ -1,5 +1,5 @@
 import uuid as uuid_pkg
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import text
@@ -19,6 +19,7 @@ def pg_utcnow(element, compiler, **kw) -> str:  # type: ignore
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
 
+# this is the base model, as a best practice, other db models should inherit it
 class BaseModel(SQLModel):
     id: Optional[int] = Field(
         default=None,
@@ -39,7 +40,7 @@ class BaseModel(SQLModel):
         )
     )
     updated_at: Optional[datetime] = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(
             DateTime(timezone=True),
             onupdate=utcnow(),

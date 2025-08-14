@@ -6,6 +6,6 @@ class BaseEnum(str, Enum):
         return str.__str__(self)
 
 
-class SortOrder:
+class SortOrder(BaseEnum):
     ASC = "asc"
     DESC = "desc"
