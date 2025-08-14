@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     PROJECT_ROOT_PATH: Path = Path(__file__).parent.parent.parent
 
-    LOGGING_CONFIG_PATH: Path = PROJECT_ROOT_PATH / "logging.yml"
+    LOGGING_CONFIG_PATH: Path = PROJECT_ROOT_PATH / "logconfig.yml"
 
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8

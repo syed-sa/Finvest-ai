@@ -2,7 +2,9 @@
 name = "ciex-backend"
 version = "0.1.0"
 description = "CIEX Backend"
-maintainers = [{ name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com" }]
+maintainers = [
+    { name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com" },
+] # depois adicionem os emails e nomes aqui turma ;)
 requires-python = ">=3.13"
 readme = "README.md"
 dependencies = [
