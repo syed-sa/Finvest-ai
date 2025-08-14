@@ -9,6 +9,10 @@ down:
 	@echo "bringing down project...."
 	docker compose down
 
+build:
+	@echo "building project...."
+	docker compose up --build
+
 bash:
 	@echo "connecting to container...."
 	docker compose exec ciex-backend bash
