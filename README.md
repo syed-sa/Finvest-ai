@@ -1,56 +1,56 @@
 <p align="center">
-    <a href="https://github.com/GabrielVGS/ciex-backend/actions">
-        <img alt="GitHub Actions status" src="https://github.com/GabrielVGS/ciex-backend/actions/workflows/main.yml/badge.svg">
+    <a href="https://github.com/CIEX-FURG/ciex-backend/actions">
+        <img alt="Status do GitHub Actions" src="https://github.com/CIEX-FURG/ciex-backend/actions/workflows/main.yml/badge.svg">
     </a>
-    <a href="https://github.com/GabrielVGS/ciex-backend/releases"><img alt="Release Status" src="https://img.shields.io/github/v/release/GabrielVGS/ciex-backend"></a>
+    <a href="https://github.com/CIEX-FURG/ciex-backend/releases"><img alt="Status do Release" src="https://img.shields.io/github/v/release/CIEX-FURG/ciex-backend"></a>
 </p>
 
+## Uso
 
+1. Execute `make up`
+2. Acesse `http://localhost:8666/v1/ping` para o servidor uvicorn
+3. Backend, API web baseada em JSON usando OpenAPI: `http://localhost:8666/v1/`
+4. Documentação interativa automática com Swagger UI (do backend OpenAPI): `http://localhost:8666/docs`
 
+## Desenvolvimento local do backend, detalhes adicionais
 
-## Usage
-1. `make up`
-2. visit `http://localhost:8666/v1/ping` for uvicorn server
-3. Backend, JSON based web API based on OpenAPI: `http://localhost/v1/`
-4. Automatic interactive documentation with Swagger UI (from the OpenAPI backend): `http://localhost/docs`
-
-## Backend local development, additional details
-
-Initialize first migration (project must be up with docker compose up and contain no 'version' files)
+Inicializar a primeira migração (o projeto deve estar rodando com docker compose up e não conter arquivos de 'version')
 ```shell
 $ make alembic-init
 ```
 
-Create new migration file
+Criar novo arquivo de migração
 ```shell
-$ docker compose exec ciex-backend alembic revision --autogenerate -m "some cool comment"
+$ docker compose exec ciex-backend alembic revision --autogenerate -m "algum comentário legal"
 ```
 
-Apply migrations
+Aplicar migrações
 ```shell
 $ make alembic-migrate
 ```
 
-### Migrations
-Every migration after that, you can create new migrations and apply them with
+### Migrações
+
+Após cada migração, você pode criar novas migrações e aplicá-las com:
 ```console
-$ make alembic-make-migrations "cool comment dude"
+$ make alembic-make-migrations "comentário legal cara"
 $ make alembic-migrate
 ```
 
-### General workflow
-See the [Makefile](/Makefile) to view available commands.
+### Fluxo de trabalho geral
 
-By default, the dependencies are managed with [uv](https://docs.astral.sh/uv/), go there and install it.
+Consulte o [Makefile](/Makefile) para visualizar os comandos disponíveis.
 
-From `./ciex-backend/` you can install all the dependencies with:
+Por padrão, as dependências são gerenciadas com [uv](https://docs.astral.sh/uv/), acesse o link e instale-o.
 
+A partir de `./ciex-backend/` você pode instalar todas as dependências com:
 ```console
 $ uv sync
 ```
 
-### pre-commit hooks
-If you haven't already done so, download [pre-commit](https://pre-commit.com/) system package and install. Once done, install the git hooks with
+### Hooks do pre-commit
+
+Se você ainda não fez isso, baixe o pacote do sistema [pre-commit](https://pre-commit.com/) e instale. Depois de concluído, instale os hooks do git com:
 ```console
 $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
