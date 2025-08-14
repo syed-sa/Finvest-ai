@@ -1,6 +1,8 @@
 import logging
+import logging.config
 
 import sentry_sdk
+import yaml  # type: ignore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,6 +10,12 @@ from src.api import routes
 from src.core.config import settings
 from src.db.session import add_postgresql_extension
 
+if settings.LOGGING_CONFIG_PATH.exists():
+    with open(settings.LOGGING_CONFIG_PATH) as f:
+        config = yaml.safe_load(f)
+    logging.config.dictConfig(config)
+else:
+    print("Warning: logconfig.yml not found")
 
 logger = logging.getLogger(__name__)
 

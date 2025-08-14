@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Any, Optional, Union
 
 from pydantic import AnyHttpUrl, Field, PostgresDsn, ValidationInfo, field_validator
@@ -7,6 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    PROJECT_ROOT_PATH: Path = Path(__file__).parent.parent.parent
+
+    LOGGING_CONFIG_PATH: Path = PROJECT_ROOT_PATH / "logconfig.yml"
 
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8

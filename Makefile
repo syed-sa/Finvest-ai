@@ -27,12 +27,17 @@ alembic-init:
 	docker compose exec ciex-backend alembic revision --autogenerate -m "init"
 
 alembic-make-migrations:
-	@echo "creating migration file...."
-	docker compose exec ciex-backend alembic revision --autogenerate -m "add year"
+	@read -p "Enter migration message: " comment; \
+	echo "Creating migration file: $$comment"; \
+	docker compose exec ciex-backend alembic revision --autogenerate -m "$$comment"
 
 alembic-migrate:
 	@echo "applying migration...."
 	docker compose exec ciex-backend alembic upgrade head
+
+alembic-reset:
+	@echo "resetting database...."
+	docker compose exec ciex-backend alembic downgrade base
 
 # lint
 test:

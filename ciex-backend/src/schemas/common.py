@@ -2,7 +2,6 @@ from typing import Any, Dict, Generic, Optional, TypeVar
 
 from pydantic.generics import GenericModel
 
-
 T = TypeVar("T")
 
 
