@@ -19,6 +19,8 @@ services:
     volumes:
       - ciex-db-data:/var/lib/postgresql/data
 
+    
+
   ciex-backend:
     restart: always
     env_file:
