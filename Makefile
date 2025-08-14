@@ -35,6 +35,10 @@ alembic-migrate:
 	@echo "applying migration...."
 	docker compose exec ciex-backend alembic upgrade head
 
+alembic-reset:
+	@echo "resetting database...."
+	docker compose exec ciex-backend alembic downgrade base
+
 # lint
 test:
 	@echo "running pytest...."
