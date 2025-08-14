@@ -1,8 +1,7 @@
-from celery import Celery
-from celery.schedules import crontab
+from celery import Celery  # type: ignore
+from celery.schedules import crontab  # type: ignore
 
 from src.api.deps import get_redis_url
-
 
 redis_url = get_redis_url()
 celery_app = Celery(__name__, broker=redis_url, backend=redis_url)
