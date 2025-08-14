@@ -5,6 +5,11 @@
     <a href="https://github.com/CIEX-FURG/ciex-backend/releases"><img alt="Status do Release" src="https://img.shields.io/github/v/release/CIEX-FURG/ciex-backend"></a>
 </p>
 
+## Documentação
+
+- [Arquitetura](docs/architecture.md) - Visão geral da arquitetura do sistema
+- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local
+
 ## Uso
 
 1. Execute `make up`
