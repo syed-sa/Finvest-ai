@@ -1,26 +1,25 @@
 [project]
 name = "ciex-backend"
 version = "0.1.0"
-description = "Base project for building fastapi backends"
-maintainers = [
-  {name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com"}
-]
-requires-python = ">=3.11"
+description = "CIEX Backend"
+maintainers = [{ name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com" }]
+requires-python = ">=3.13"
 readme = "README.md"
 dependencies = [
     "alembic==1.13.2",
     "sqlalchemy==2.0.41",
-    "psycopg[binary]==3.1.13",
     "fastapi==0.116.1",
     "pydantic-settings==2.10.1",
     "sqlmodel==0.0.24",
     "redis==6.2.0",
     "celery[beat,redis]==5.2.7",
     "uvicorn[standard]==0.35.0",
-    "PyYAML==6.0.1",
+    "pyyaml==6.0.1",
     "httpx==0.28.1",
     "gunicorn==23.0.0",
     "sentry-sdk[fastapi]==2.33.0",
+    "pydantic>=2.11.7",
+    "psycopg[binary]>=3.2.9",
 ]
 
 [dependency-groups]
@@ -33,7 +32,7 @@ dev = [
     "mypy==1.16.1",
     "ruff==0.12.2",
     "requests==2.32.3",
-    "sqlalchemy-stubs==0.4"
+    "sqlalchemy-stubs==0.4",
 ]
 
 [tool.isort]
@@ -64,19 +63,19 @@ extend-exclude = '''
 line-length = 100
 exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache", "migrations"]
 lint.select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
     # "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+    "C", # flake8-comprehensions
+    "B", # flake8-bugbear
 ]
 lint.ignore = [
     "B904",
     "B006",
-    "E501",  # line too long, handled by black
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -110,9 +109,5 @@ strict_equality = true
 # --strict end
 
 [[tool.mypy.overrides]]
-module = [
-    "fastapi_cache.*",
-    "redis.*",
-    "celery.*",
-]
+module = ["fastapi_cache.*", "redis.*", "celery.*"]
 ignore_missing_imports = true
