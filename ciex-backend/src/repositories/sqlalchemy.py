@@ -6,11 +6,18 @@ from sqlmodel import SQLModel, select
 
 from src.interfaces.repository import IRepository
 
-
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=SQLModel)
 logger: logging.Logger = logging.getLogger(__name__)
+
+
+# This is the base class with several methods to interact with the database
+# Other repositories should inherit from this class to avoid code duplication
+# Example
+# Class UserRepository(BaseSQLAlchemyRepository[User, UserCreate, UserUpdate]) -> Where User is the SQLModel class
+#                                                                              -> Where UserCreate is the Pydantic model for creating a user
+#                                                                              -> Where UserUpdate is the Pydantic model for updating a user
 
 
 class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
