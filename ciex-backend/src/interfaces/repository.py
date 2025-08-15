@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, List, Optional
 
+from fastapi_pagination import Page
+
 
 class IRepository(metaclass=ABCMeta):
     """Class representing the repository interface."""
@@ -34,6 +36,14 @@ class IRepository(metaclass=ABCMeta):
         sort_order: Optional[str] = None,
     ) -> List[Any]:
         """Get all instances."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def paginate(
+        self,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None,
+    ) -> Page[Any]:
         raise NotImplementedError
 
     @abstractmethod
