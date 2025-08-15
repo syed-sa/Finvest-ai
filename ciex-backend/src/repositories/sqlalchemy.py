@@ -1,9 +1,12 @@
 import logging
 from typing import Any, Generic, List, Optional, Type, TypeVar
 
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.orm import Session
 from sqlmodel import SQLModel, select
 
+from src.core.exceptions import ObjectNotFound
 from src.interfaces.repository import IRepository
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
@@ -58,8 +61,8 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         response = self.db.execute(query)
         scalar: Optional[ModelType] = response.scalar_one_or_none()
 
-        # if not scalar:
-        #     raise ObjectNotFound(f"Object with [{kwargs}] not found.")
+        if not scalar:
+            raise ObjectNotFound(f"Object with [{kwargs}] not found.")
 
         return scalar
 
@@ -85,6 +88,23 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         self.db.delete(obj)  # type: ignore
         self.db.commit()
 
+    def _get_order_by(
+        self, sort_field: Optional[str] = None, sort_order: Optional[str] = None
+    ) -> Any:
+        columns = self._model.__table__.columns
+
+        if sort_field and sort_field not in columns:
+            sort_field = None
+
+        if not sort_field:
+            sort_field = "created_at"
+
+        if sort_order not in ["asc", "desc"]:
+            sort_order = "desc"
+
+        column = columns[sort_field]
+        return column.asc() if sort_order == "asc" else column.desc()
+
     def all(
         self,
         skip: int = 0,
@@ -92,19 +112,21 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = None,
     ) -> List[ModelType]:
-        columns = self._model.__table__.columns
-
-        if not sort_field:
-            sort_field = "created_at"
-
-        if not sort_order:
-            sort_order = "desc"
-
-        order_by = getattr(columns[sort_field], sort_order)()
+        order_by = self._get_order_by(sort_field, sort_order)
         query = select(self._model).offset(skip).limit(limit).order_by(order_by)  # type: ignore
 
         response = self.db.execute(query)
         return response.scalars().all()  # type: ignore
+
+    def paginate(
+        self,
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None,
+    ) -> Page[ModelType]:
+        order_by = self._get_order_by(sort_field, sort_order)
+        query = select(self._model).order_by(order_by)  # type: ignore
+
+        return paginate(self.db, query)
 
     def f(self, **kwargs: Any) -> List[ModelType]:
         logger.info(f"Fetching [{self._model.__class__.__name__}] object by [{kwargs}]")
