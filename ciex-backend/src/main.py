@@ -5,6 +5,7 @@ import sentry_sdk
 import yaml  # type: ignore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_pagination import add_pagination
 
 from src.api import routes
 from src.core.config import settings
@@ -51,6 +52,8 @@ def on_startup() -> None:
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
 app.add_event_handler("startup", on_startup)
+
+add_pagination(app)
 
 app.include_router(routes.home_router)
 app.include_router(routes.api_router, prefix=f"/{settings.VERSION}")
