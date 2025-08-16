@@ -94,7 +94,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         """
         logger.info(f"Inserting new object[{obj_in.__class__.__name__}]")
 
-        db_obj = self._model.from_orm(obj_in)
+        db_obj = self._model.model_validate(obj_in)
         add = kwargs.get("add", True)
         flush = kwargs.get("flush", True)
         commit = kwargs.get("commit", True)
@@ -364,11 +364,12 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
             >>> same_user = user_repo.get_or_create(user_data, email="bob@example.com")
             >>> assert user.id == same_user.id
         """
-        get_instance: Optional[ModelType] = self.get(**kwargs)
+        try:
+            get_instance: Optional[ModelType] = self.get(**kwargs)
 
-        if get_instance:
-            return get_instance
-
-        instance: ModelType = self.create(obj_in)
+            if get_instance:
+                return get_instance
+        except ObjectNotFound:
+            instance: ModelType = self.create(obj_in)
 
         return instance
