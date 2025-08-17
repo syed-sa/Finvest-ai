@@ -1,5 +1,5 @@
 name: unit-tests
-on: 
+on:
   workflow_call:
     secrets:
       CODECOV_TOKEN:
