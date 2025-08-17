@@ -1,5 +1,5 @@
 services:
-  backend:
+  ciex-backend:
     build:
       context: ../ciex-backend
       dockerfile: ./Dockerfile
