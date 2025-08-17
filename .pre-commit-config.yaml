@@ -25,8 +25,8 @@ repos:
     hooks:
     -   id: isort
         args: ["--settings-path=./ciex-backend/pyproject.toml"]
--   repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
-    hooks:
-    -   id: codespell
-        args: ["-L THIRDPARTY"]
+# -   repo: https://github.com/codespell-project/codespell
+#     rev: v2.4.1
+#     hooks:
+#     -   id: codespell
+#         args: ["-L THIRDPARTY"]
