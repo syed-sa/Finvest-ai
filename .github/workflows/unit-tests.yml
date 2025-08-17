@@ -21,6 +21,7 @@ jobs:
         with:
           files: /data/coverage.xml
           flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }
       - name: Clean-up
         if: always()
         run: |
