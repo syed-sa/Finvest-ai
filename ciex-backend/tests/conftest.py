@@ -7,6 +7,7 @@ from sqlmodel import SQLModel
 
 from src.core.config import settings
 
+
 test_engine = create_engine(
     settings.POSTGRES_URL,  # Consider using a TEST_POSTGRES_URL instead
     echo=settings.DEBUG,
