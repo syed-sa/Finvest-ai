@@ -1,9 +1,5 @@
----
-
 name: unit-tests
-
 on: [workflow_call]  # allow this workflow to be called from other workflows
-
 jobs:
   unit_tests:
     runs-on: ubuntu-latest
@@ -15,11 +11,14 @@ jobs:
         run: |
           docker compose -f ops/docker-compose.test.yml up --detach --wait
           docker compose -f ops/docker-compose.test.yml exec ciex-backend pytest --cov-report=xml:/data/coverage.xml --cov=src/ tests/
+      - name: Copy coverage file from container
+        run: |
+          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./coverage.xml
       - name: Codecov
         if: success()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
-          files: /data/coverage.xml
+          files: ./coverage.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Clean-up
