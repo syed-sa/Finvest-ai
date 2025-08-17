@@ -24,7 +24,6 @@ services:
       - /data:/data  # to access coverage.xml
     depends_on:
       - ciex-db-test
-
   ciex-db-test:
     image: postgres:15-alpine
     expose:
