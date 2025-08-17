@@ -70,3 +70,4 @@ services:
     depends_on:
       - ciex-backend
       - redis
+      
