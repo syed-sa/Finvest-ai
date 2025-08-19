@@ -8,7 +8,7 @@
 ## Documentação
 
 - [Arquitetura](docs/architecture.md) - Visão geral da arquitetura do sistema
-- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local CIEX-FURG
+- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local CIEX
 
 ## Uso
 
