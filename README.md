@@ -38,7 +38,7 @@ $ make alembic-migrate
 
 Após cada migração, você pode criar novas migrações e aplicá-las com:
 ```console
-$ make alembic-make-migrations "comentário legal cara"
+$ make alembic-make-migrations "comentário mais legal ainda"
 $ make alembic-migrate
 ```
 
