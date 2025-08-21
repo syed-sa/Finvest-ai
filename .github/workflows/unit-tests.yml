@@ -15,15 +15,23 @@ jobs:
         run: |
           docker compose -f ops/docker-compose.test.yml up --detach --wait
           docker compose -f ops/docker-compose.test.yml exec ciex-backend pytest --cov-report=xml:/data/coverage.xml --cov=src/ tests/
-      - name: Copy coverage file from container
+          docker compose -f ops/docker-compose.test.yml exec ciex-backend pytest --cov=src/ tests/ --junitxml=/data/junit.xml -o junit_family=legacy
+      - name: Copy coverage and Junit file from container
         run: |
           docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./coverage.xml
+          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./junit.xml
       - name: Codecov
         if: success()
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
           flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Clean-up
         if: always()
