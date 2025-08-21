@@ -19,7 +19,7 @@ jobs:
       - name: Copy coverage and Junit file from container
         run: |
           docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./coverage.xml
-          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./junit.xml
+          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/junit.xml ./junit.xml
       - name: Codecov
         if: success()
         uses: codecov/codecov-action@v5
