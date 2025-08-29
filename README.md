@@ -2,7 +2,11 @@
     <a href="https://github.com/CIEX-FURG/ciex-backend/actions">
         <img alt="Status do GitHub Actions" src="https://github.com/CIEX-FURG/ciex-backend/actions/workflows/main.yml/badge.svg">
     </a>
+    <a href="https://codecov.io/gh/CIEX-FURG/ciex-backend" > 
+     <img src="https://codecov.io/gh/CIEX-FURG/ciex-backend/branch/main/graph/badge.svg?token=899NB4AK7J"/> 
+    </a>
     <a href="https://github.com/CIEX-FURG/ciex-backend/releases"><img alt="Status do Release" src="https://img.shields.io/github/v/release/CIEX-FURG/ciex-backend"></a>
+    
 </p>
 
 ## Documentação
