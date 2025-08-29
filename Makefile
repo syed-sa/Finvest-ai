@@ -71,8 +71,8 @@ BREW-exists: ; @which brew > /dev/null
 
 hooks: check
 	@echo "installing pre-commit hooks...."
-	pre-commit install
+	uvx pre-commit install
 
 precommit-run:
 	@echo "running pre-commit hooks...."
-	pre-commit run --all-files
+	uvx pre-commit run --all-files
