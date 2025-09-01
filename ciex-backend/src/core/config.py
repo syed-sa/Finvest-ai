@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     WEB_CONCURRENCY: int = Field(default=9)
     MAX_OVERFLOW: int = Field(default=64)
     POOL_SIZE: Optional[int] = None
+    DB_SCHEMA: str = Field(default="postgresql+asyncpg")
 
     @field_validator("POOL_SIZE", mode="before")
     @classmethod
@@ -51,7 +52,7 @@ class Settings(BaseSettings):
             return v
 
         return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
+            scheme=values.data.get("DB_SCHEME"),  # type: ignore
             username=values.data.get("POSTGRES_USER"),
             password=values.data.get("POSTGRES_PASSWORD"),
             host=values.data.get("POSTGRES_HOST"),
