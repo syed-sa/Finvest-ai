@@ -47,3 +47,11 @@ class BaseModel(SQLModel):
             nullable=True,
         ),
     )
+
+    deleted_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(
+            DateTime(timezone=True),
+            nullable=True,
+        ),
+    )
