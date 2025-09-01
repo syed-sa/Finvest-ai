@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 
 import pytest
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel
 
 from src.core.config import settings
@@ -37,7 +37,7 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
     async with async_test_engine.begin() as connection:
         session = AsyncTestSessionLocal(bind=connection)
-        
+
         try:
             yield session
         finally:
