@@ -2,13 +2,12 @@ import logging
 from typing import Any, Generic, List, Optional, Type, TypeVar
 
 from fastapi_pagination import Page
-from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.ext.sqlalchemy import apaginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel, select
 
 from src.core.exceptions import ObjectNotFound
 from src.interfaces.repository import IRepository
-
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
@@ -211,7 +210,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         """
         obj = await self.get(**kwargs)
 
-        self.db.delete(obj)  # type: ignore
+        await self.db.delete(obj)  # type: ignore
         await self.db.commit()
 
     def _get_order_by(
@@ -308,7 +307,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         order_by = self._get_order_by(sort_field, sort_order)
         query = select(self._model).order_by(order_by)  # type: ignore
 
-        return await paginate(self.db, query)
+        return await apaginate(self.db, query)
 
     async def f(self, **kwargs: Any) -> List[ModelType]:
         """
