@@ -8,6 +8,7 @@ from sqlmodel import SQLModel
 
 from src.core.config import settings
 
+
 # Create test engine with NullPool to avoid connection conflicts
 async_test_engine = create_async_engine(
     settings.POSTGRES_URL,  # type: ignore

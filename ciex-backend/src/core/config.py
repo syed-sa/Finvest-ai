@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = Field(default="")
     POSTGRES_PORT: str = Field(default="")
     POSTGRES_DB: str = Field(default="")
+    POSTGRES_DB_SCHEMA: str = Field(default="postgresql+asyncpg")
     POSTGRES_URL: Union[Optional[PostgresDsn], Optional[str]] = None
     REDIS_HOST: str = Field(default="")
     REDIS_PORT: str = Field(default="")
@@ -51,7 +52,7 @@ class Settings(BaseSettings):
             return v
 
         return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
+            scheme=values.data.get("POSTGRES_DB_SCHEMA"),  # type: ignore
             username=values.data.get("POSTGRES_USER"),
             password=values.data.get("POSTGRES_PASSWORD"),
             host=values.data.get("POSTGRES_HOST"),
