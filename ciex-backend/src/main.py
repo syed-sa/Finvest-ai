@@ -38,8 +38,8 @@ app = FastAPI(
 )
 
 
-def on_startup() -> None:
-    add_postgresql_extension()
+async def on_startup() -> None:
+    await add_postgresql_extension()
     if settings.SENTRY_DSN:
         sentry_sdk.init(
             dsn=settings.SENTRY_DSN,

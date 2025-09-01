@@ -1,27 +1,32 @@
-from typing import Generator
+from typing import AsyncGenerator
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.core.config import settings
 
 
-engine = create_engine(
+async_engine = create_async_engine(
     settings.POSTGRES_URL,
     echo=settings.DEBUG,
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
-def add_postgresql_extension() -> None:
-    with SessionLocal() as db:
+async def add_postgresql_extension() -> None:
+    async with AsyncSessionLocal() as db:
         query = text("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-        db.execute(query)
+        await db.execute(query)
+        await db.commit()
 
 
-def get_session() -> Generator[Session, None, None]:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     # expire_on_commit=False will prevent attributes from being expired
     # after commit.
-    with SessionLocal() as session:
+    async with AsyncSessionLocal() as session:
         yield session

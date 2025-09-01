@@ -1,8 +1,11 @@
-from typing import cast
+from typing import AsyncGenerator, cast
 
+from fastapi import Depends
 from redis import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
+from src.db.session import get_session
 
 
 def get_redis_url() -> str:
@@ -17,3 +20,11 @@ def get_redis_client() -> Redis:
         decode_responses=True,
     )
     return cast(Redis, redis)
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency to get database session.
+    """
+    async for session in get_session():
+        yield session

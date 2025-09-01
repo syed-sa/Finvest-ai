@@ -3,7 +3,7 @@ from typing import Any, Generic, List, Optional, Type, TypeVar
 
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel, select
 
 from src.core.exceptions import ObjectNotFound
@@ -18,7 +18,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     """
-    A generic SQLAlchemy repository base class that provides common CRUD operations.
+    A generic async SQLAlchemy repository base class that provides common CRUD operations.
 
     This class serves as a foundation for all repository classes, providing standardized
     methods for database operations while maintaining type safety through generics.
@@ -49,26 +49,26 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         ...     _model = User
         ...
         >>> # Usage
-        >>> user_repo = UserRepository(db_session)
-        >>> new_user = user_repo.create(UserCreate(name="John", email="john@example.com"))
+        >>> user_repo = UserRepository(async_db_session)
+        >>> new_user = await user_repo.create(UserCreate(name="John", email="john@example.com"))
     """
 
     _model: Type[ModelType]
 
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         """
         Initialize the repository with a database session.
 
         Args:
-            db: SQLAlchemy database session
+            db: SQLAlchemy async database session
 
         Example:
-            >>> from sqlalchemy.orm import Session
-            >>> user_repo = UserRepository(db_session)
+            >>> from sqlalchemy.ext.asyncio import AsyncSession
+            >>> user_repo = UserRepository(async_db_session)
         """
         self.db = db
 
-    def create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
+    async def create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
         """
         Create a new object in the database.
 
@@ -87,11 +87,11 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> user_data = UserCreate(name="Alice", email="alice@example.com")
-            >>> new_user = user_repo.create(user_data)
+            >>> new_user = await user_repo.create(user_data)
             >>> print(new_user.id)  # Auto-generated ID
 
             >>> # Create without committing (useful for batch operations)
-            >>> user = user_repo.create(user_data, commit=False)
+            >>> user = await user_repo.create(user_data, commit=False)
         """
         logger.info(f"Inserting new object[{obj_in.__class__.__name__}]")
 
@@ -106,18 +106,18 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         # Navigate these with caution
         if add and commit:
             try:
-                self.db.commit()
-                self.db.refresh(db_obj)
+                await self.db.commit()
+                await self.db.refresh(db_obj)
             except Exception as exc:
                 logger.error(exc)
-                self.db.rollback()
+                await self.db.rollback()
 
         elif add and flush:
-            self.db.flush()
+            await self.db.flush()
 
         return db_obj
 
-    def get(self, **kwargs: Any) -> Optional[ModelType]:
+    async def get(self, **kwargs: Any) -> Optional[ModelType]:
         """
         Get a single object by filter criteria.
 
@@ -132,18 +132,18 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Get user by ID
-            >>> user = user_repo.get(id=1)
+            >>> user = await user_repo.get(id=1)
 
             >>> # Get user by email
-            >>> user = user_repo.get(email="john@example.com")
+            >>> user = await user_repo.get(email="john@example.com")
 
             >>> # Get user by multiple criteria
-            >>> user = user_repo.get(name="John", is_active=True)
+            >>> user = await user_repo.get(name="John", is_active=True)
         """
         logger.info(f"Fetching [{self._model.__class__.__name__}] object by [{kwargs}]")
 
         query = select(self._model).filter_by(**kwargs)  # type: ignore
-        response = self.db.execute(query)
+        response = await self.db.execute(query)
         scalar: Optional[ModelType] = response.scalar_one_or_none()
 
         if not scalar:
@@ -151,7 +151,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         return scalar
 
-    def update(self, obj_current: ModelType, obj_in: UpdateSchemaType) -> ModelType:
+    async def update(self, obj_current: ModelType, obj_in: UpdateSchemaType) -> ModelType:
         """
         Update an existing object in the database.
 
@@ -167,15 +167,15 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Get existing user
-            >>> user = user_repo.get(id=1)
+            >>> user = await user_repo.get(id=1)
 
             >>> # Update only the name (email remains unchanged)
             >>> update_data = UserUpdate(name="John Smith")
-            >>> updated_user = user_repo.update(user, update_data)
+            >>> updated_user = await user_repo.update(user, update_data)
 
             >>> # Update multiple fields
             >>> update_data = UserUpdate(name="Jane", email="jane@example.com")
-            >>> updated_user = user_repo.update(user, update_data)
+            >>> updated_user = await user_repo.update(user, update_data)
         """
         logger.info(f"Updating [{self._model.__class__.__name__}] object with [{obj_in}]")
 
@@ -187,12 +187,12 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
             setattr(obj_current, field, update_data[field])
 
         self.db.add(obj_current)
-        self.db.commit()
-        self.db.refresh(obj_current)
+        await self.db.commit()
+        await self.db.refresh(obj_current)
 
         return obj_current
 
-    def delete(self, **kwargs: Any) -> None:
+    async def delete(self, **kwargs: Any) -> None:
         """
         Delete an object from the database by filter criteria.
 
@@ -204,15 +204,15 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Delete user by ID
-            >>> user_repo.delete(id=1)
+            >>> await user_repo.delete(id=1)
 
             >>> # Delete user by email
-            >>> user_repo.delete(email="user@example.com")
+            >>> await user_repo.delete(email="user@example.com")
         """
-        obj = self.get(**kwargs)
+        obj = await self.get(**kwargs)
 
         self.db.delete(obj)  # type: ignore
-        self.db.commit()
+        await self.db.commit()
 
     def _get_order_by(
         self, sort_field: Optional[str] = None, sort_order: Optional[str] = None
@@ -245,7 +245,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         column = columns[sort_field]
         return column.asc() if sort_order == "asc" else column.desc()
 
-    def all(
+    async def all(
         self,
         skip: int = 0,
         limit: int = 100,
@@ -266,21 +266,21 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Get first 10 users
-            >>> users = user_repo.all(limit=10)
+            >>> users = await user_repo.all(limit=10)
 
             >>> # Get users 20-30, sorted by name ascending
-            >>> users = user_repo.all(skip=20, limit=10, sort_field="name", sort_order="asc")
+            >>> users = await user_repo.all(skip=20, limit=10, sort_field="name", sort_order="asc")
 
             >>> # Get all users (up to default limit of 100)
-            >>> all_users = user_repo.all()
+            >>> all_users = await user_repo.all()
         """
         order_by = self._get_order_by(sort_field, sort_order)
         query = select(self._model).offset(skip).limit(limit).order_by(order_by)  # type: ignore
 
-        response = self.db.execute(query)
+        response = await self.db.execute(query)
         return response.scalars().all()  # type: ignore
 
-    def paginate(
+    async def paginate(
         self,
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = None,
@@ -297,20 +297,20 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Get paginated users (page size determined by fastapi-pagination settings)
-            >>> page = user_repo.paginate()
+            >>> page = await user_repo.paginate()
             >>> print(f"Total: {page.total}, Page: {page.page}")
             >>> for user in page.items:
             ...     print(user.name)
 
             >>> # Paginate with custom sorting
-            >>> page = user_repo.paginate(sort_field="email", sort_order="asc")
+            >>> page = await user_repo.paginate(sort_field="email", sort_order="asc")
         """
         order_by = self._get_order_by(sort_field, sort_order)
         query = select(self._model).order_by(order_by)  # type: ignore
 
-        return paginate(self.db, query)
+        return await paginate(self.db, query)
 
-    def f(self, **kwargs: Any) -> List[ModelType]:
+    async def f(self, **kwargs: Any) -> List[ModelType]:
         """
         Find all objects matching the given filter criteria.
 
@@ -325,23 +325,23 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Example:
             >>> # Find all active users
-            >>> active_users = user_repo.f(is_active=True)
+            >>> active_users = await user_repo.f(is_active=True)
 
             >>> # Find all users with specific role
-            >>> admins = user_repo.f(role="admin")
+            >>> admins = await user_repo.f(role="admin")
 
             >>> # Find users by multiple criteria
-            >>> verified_users = user_repo.f(is_verified=True, is_active=True)
+            >>> verified_users = await user_repo.f(is_verified=True, is_active=True)
         """
         logger.info(f"Fetching [{self._model.__class__.__name__}] object by [{kwargs}]")
 
         query = select(self._model).filter_by(**kwargs)  # type: ignore
-        response = self.db.execute(query)
+        response = await self.db.execute(query)
         scalars: List[ModelType] = response.scalars().all()
 
         return scalars
 
-    def get_or_create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
+    async def get_or_create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
         """
         Get an existing object or create it if it doesn't exist.
 
@@ -359,18 +359,18 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         Example:
             >>> # Get or create user by email
             >>> user_data = UserCreate(name="Bob", email="bob@example.com")
-            >>> user = user_repo.get_or_create(user_data, email="bob@example.com")
+            >>> user = await user_repo.get_or_create(user_data, email="bob@example.com")
 
             >>> # This will return the same user if called again
-            >>> same_user = user_repo.get_or_create(user_data, email="bob@example.com")
+            >>> same_user = await user_repo.get_or_create(user_data, email="bob@example.com")
             >>> assert user.id == same_user.id
         """
         try:
-            get_instance: Optional[ModelType] = self.get(**kwargs)
+            get_instance: Optional[ModelType] = await self.get(**kwargs)
 
             if get_instance:
                 return get_instance
         except ObjectNotFound:
-            instance: ModelType = self.create(obj_in)
+            instance: ModelType = await self.create(obj_in)
 
         return instance
