@@ -7,7 +7,7 @@ from src.core.config import settings
 
 
 async_engine = create_async_engine(
-    settings.POSTGRES_URL,
+    settings.POSTGRES_URL,  # type: ignore
     echo=settings.DEBUG,
 )
 

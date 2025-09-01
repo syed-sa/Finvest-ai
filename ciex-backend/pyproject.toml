@@ -21,7 +21,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "redis>=6.4.0",
     "sentry-sdk[fastapi]>=2.34.1",
-    "sqlalchemy>=2.0.43",
+    "sqlalchemy[asyncio]>=2.0.43",
     "sqlmodel>=0.0.24",
     "uvicorn>=0.35.0",
 ]

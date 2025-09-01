@@ -1,55 +1,81 @@
 from typing import AsyncGenerator
 
-import pytest
+import pytest_asyncio
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.core.config import settings
 
-
+# Create test engine with NullPool to avoid connection conflicts
 async_test_engine = create_async_engine(
-    settings.POSTGRES_URL,  # Consider using a TEST_POSTGRES_URL instead
+    settings.POSTGRES_URL,  # type: ignore
     echo=settings.DEBUG,
+    poolclass=NullPool,  # Disable connection pooling for tests
 )
+
 AsyncTestSessionLocal = async_sessionmaker(
     bind=async_test_engine,
     class_=AsyncSession,
     expire_on_commit=False,
+    autoflush=False,  # Prevent automatic flushing
 )
 
 
-async def add_postgresql_extension_test() -> None:
-    async with AsyncTestSessionLocal() as db:
-        query = text("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-        await db.execute(query)
-        await db.commit()
+@pytest_asyncio.fixture(scope="session")
+async def setup_database():
+    """Setup database schema once per test session"""
+    async with async_test_engine.begin() as connection:
+        # Add PostgreSQL extension
+        await connection.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        # Create all tables
+        await connection.run_sync(SQLModel.metadata.create_all)
+
+    yield
+
+    # Cleanup: drop all tables after tests
+    async with async_test_engine.begin() as connection:
+        await connection.run_sync(SQLModel.metadata.drop_all)
+
+    await async_test_engine.dispose()
 
 
-@pytest.fixture
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+@pytest_asyncio.fixture
+async def db_session(setup_database) -> AsyncGenerator[AsyncSession, None]:
     """
     Create a test database session with proper cleanup.
-    Each test gets a fresh transaction that's rolled back after the test.
+    Each test gets a fresh session with transaction rollback.
     """
+    connection = await async_test_engine.connect()
+    transaction = await connection.begin()
 
-    await add_postgresql_extension_test()
+    session = AsyncSession(
+        bind=connection, expire_on_commit=False, autoflush=False, autocommit=False
+    )
 
-    async with async_test_engine.begin() as connection:
-        session = AsyncTestSessionLocal(bind=connection)
+    try:
+        yield session
+        # Don't rollback here - let the test complete first
+    except Exception:
+        # await transaction.rollback()
+        raise
+    finally:
+        await session.close()
+        # Only rollback if transaction is still active and no exception occurred
+        if transaction.is_active:
+            await transaction.rollback()
+        await connection.close()
 
-        try:
-            yield session
-        finally:
-            await session.close()
+
+# Configure pytest-asyncio
+pytest_asyncio.fixture(scope="session", autouse=True)
 
 
-@pytest.fixture
-async def setup_test_db(db_session):
-    """Create tables for testing"""
+async def event_loop():
+    """Create an instance of the default event loop for the test session."""
+    import asyncio
 
-    # Create tables in the test database
-    async with async_test_engine.begin() as connection:
-        await connection.run_sync(SQLModel.metadata.create_all)
-    yield
-    # Cleanup is handled by the db_session fixture rollback
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
