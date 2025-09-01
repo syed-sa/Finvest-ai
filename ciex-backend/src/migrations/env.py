@@ -35,6 +35,12 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
+def get_sync_url() -> str:
+    """Convert async URL to sync URL for Alembic"""
+    url = str(settings.POSTGRES_URL)
+    return url.replace("postgresql+asyncpg://", "postgresql://")
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -48,7 +54,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=settings.POSTGRES_URL,  # type: ignore
+        url=get_sync_url(),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -72,15 +78,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    # connectable = AsyncEngine(
-    #     engine_from_config(
-    #         config.get_section(config.config_ini_section),
-    #         prefix="sqlalchemy.",
-    #         poolclass=pool.NullPool,
-    #         future=True,
-    #     )
-    # )
-    connectable = create_engine(settings.POSTGRES_URL, echo=True)
+    connectable = create_engine(get_sync_url(), echo=True)
 
     with connectable.connect() as connection:
         do_run_migrations(connection)
