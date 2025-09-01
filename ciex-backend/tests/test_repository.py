@@ -32,12 +32,13 @@ class UserRepository(BaseSQLAlchemyRepository[User, UserCreate, UserUpdate]):
     _model = User
 
 
-def test_create_user(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_create_user(db_session, setup_test_db):
     """Test creating a user"""
     user_repo = UserRepository(db_session)
 
     user_data = UserCreate(name="John Doe", email="john@example.com")
-    created_user = user_repo.create(user_data)
+    created_user = await user_repo.create(user_data)
 
     assert created_user.id is not None
     assert created_user.name == "John Doe"
@@ -45,100 +46,107 @@ def test_create_user(db_session, setup_test_db):
     assert created_user.is_active is True
 
 
-def test_get_user(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_get_user(db_session, setup_test_db):
     """Test getting a user by criteria"""
     user_repo = UserRepository(db_session)
 
     user_data = UserCreate(name="Jane Doe", email="jane@example.com")
-    created_user = user_repo.create(user_data)
+    created_user = await user_repo.create(user_data)
 
-    found_user = user_repo.get(email="jane@example.com")
+    found_user = await user_repo.get(email="jane@example.com")
     assert found_user.id == created_user.id
     assert found_user.name == "Jane Doe"
 
 
-def test_update_user(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_update_user(db_session, setup_test_db):
     """Test updating a user"""
     user_repo = UserRepository(db_session)
 
     user_data = UserCreate(name="Bob Smith", email="bob@example.com")
-    created_user = user_repo.create(user_data)
+    created_user = await user_repo.create(user_data)
 
     update_data = UserUpdate(name="Robert Smith")
-    updated_user = user_repo.update(created_user, update_data)
+    updated_user = await user_repo.update(created_user, update_data)
 
     assert updated_user.name == "Robert Smith"
     assert updated_user.email == "bob@example.com"  # Should remain unchanged
 
 
-def test_delete_user(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_delete_user(db_session, setup_test_db):
     """Test deleting a user"""
     user_repo = UserRepository(db_session)
 
     user_data = UserCreate(name="Delete Me", email="delete@example.com")
-    created_user = user_repo.create(user_data)
+    created_user = await user_repo.create(user_data)
 
-    user_repo.delete(id=created_user.id)
+    await user_repo.delete(id=created_user.id)
 
     with pytest.raises(ObjectNotFound):
-        user_repo.get(id=created_user.id)
+        await user_repo.get(id=created_user.id)
 
 
-def test_paginate(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_paginate(db_session, setup_test_db):
     """Test pagination functionality"""
     user_repo = UserRepository(db_session)
     set_params(Params(size=10, page=1))
 
     for i in range(10):
         user_data = UserCreate(name=f"User {i}", email=f"user{i}@example.com")
-        user_repo.create(user_data)
+        await user_repo.create(user_data)
 
-    page_result = user_repo.paginate(sort_field="name", sort_order="asc")
+    page_result = await user_repo.paginate(sort_field="name", sort_order="asc")
 
     assert len(page_result.items) == 10
     assert page_result.total == 10
     assert page_result.items[0].name == "User 0"
 
 
-def test_all_users(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_all_users(db_session, setup_test_db):
     """Test getting all users with pagination"""
     user_repo = UserRepository(db_session)
 
     for i in range(3):
         user_data = UserCreate(name=f"User {i}", email=f"user{i}@example.com")
-        user_repo.create(user_data)
+        await user_repo.create(user_data)
 
-    all_users = user_repo.all(limit=10, sort_field="name", sort_order="asc")
+    all_users = await user_repo.all(limit=10, sort_field="name", sort_order="asc")
 
     assert len(all_users) == 3
     assert all_users[0].name == "User 0"
 
 
-def test_filter_users(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_filter_users(db_session, setup_test_db):
     """Test filtering users with the f() method"""
     user_repo = UserRepository(db_session)
 
     active_user = UserCreate(name="Active User", email="active@example.com", is_active=True)
     inactive_user = UserCreate(name="Inactive User", email="inactive@example.com", is_active=False)
 
-    user_repo.create(active_user)
-    user_repo.create(inactive_user)
+    await user_repo.create(active_user)
+    await user_repo.create(inactive_user)
 
-    active_users = user_repo.f(is_active=True)
+    active_users = await user_repo.f(is_active=True)
     assert len(active_users) == 1
     assert active_users[0].name == "Active User"
 
 
-def test_get_or_create(db_session, setup_test_db):
+@pytest.mark.asyncio
+async def test_get_or_create(db_session, setup_test_db):
     """Test get_or_create functionality"""
     user_repo = UserRepository(db_session)
 
     user_data = UserCreate(name="Get Or Create", email="getorcreate@example.com")
 
-    user1 = user_repo.get_or_create(user_data, email="getorcreate@example.com")
+    user1 = await user_repo.get_or_create(user_data, email="getorcreate@example.com")
     assert user1.id is not None
 
-    user2 = user_repo.get_or_create(user_data, email="getorcreate@example.com")
+    user2 = await user_repo.get_or_create(user_data, email="getorcreate@example.com")
     assert user1.id == user2.id
 
 
