@@ -8,27 +8,27 @@ class IRepository(metaclass=ABCMeta):
     """Class representing the repository interface."""
 
     @abstractmethod
-    def create(self, obj_in: Any, **kwargs: Any) -> Any:
+    async def create(self, obj_in: Any, **kwargs: Any) -> Any:
         """Create new entity and returns the saved instance."""
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, obj_current: Any, obj_in: Any) -> Any:
+    async def update(self, obj_current: Any, obj_in: Any) -> Any:
         """Updates an entity and returns the saved instance."""
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, **kwargs: Any) -> Optional[Any]:
+    async def get(self, **kwargs: Any) -> Optional[Any]:
         """Get and return one instance by filter."""
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, **kwargs: Any) -> None:
+    async def delete(self, **kwargs: Any) -> None:
         """Delete one instance by filter."""
         raise NotImplementedError
 
     @abstractmethod
-    def all(
+    async def all(
         self,
         skip: int = 0,
         limit: int = 50,
@@ -39,7 +39,7 @@ class IRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def paginate(
+    async def paginate(
         self,
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = None,
@@ -47,7 +47,7 @@ class IRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def f(self, **kwargs: Any) -> List[Any]:
+    async def f(self, **kwargs: Any) -> List[Any]:
         """Filter instances"""
         raise NotImplementedError
 
