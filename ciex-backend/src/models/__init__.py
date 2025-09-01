@@ -20,3 +20,6 @@
 
 # from .test import Test
 # from .user import User
+
+from .base import BaseModel  # noqa
+from .user import User  # noqa
