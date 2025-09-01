@@ -1,4 +1,4 @@
-import uuid as uuid_pkg
+import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -21,23 +21,20 @@ def pg_utcnow(element, compiler, **kw) -> str:  # type: ignore
 
 # this is the base model, as a best practice, other db models should inherit it
 class BaseModel(SQLModel):
-    id: Optional[int] = Field(
-        default=None,
+    id: Optional[uuid.UUID] = Field(
+        default_factory=uuid.uuid4,
         primary_key=True,
         index=True,
-    )
-    ref_id: Optional[uuid_pkg.UUID] = Field(
-        default_factory=uuid_pkg.uuid4,
-        index=True,
-        nullable=False,
         sa_column_kwargs={"server_default": text("gen_random_uuid()"), "unique": True},
     )
+
     created_at: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(
             DateTime(timezone=True),
             server_default=utcnow(),
             nullable=True,
-        )
+        ),
     )
     updated_at: Optional[datetime] = Field(
         default_factory=lambda: datetime.now(timezone.utc),
