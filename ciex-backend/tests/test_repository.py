@@ -33,7 +33,7 @@ class UserRepository(BaseSQLAlchemyRepository[User, UserCreate, UserUpdate]):
 
 
 @pytest.mark.asyncio
-async def test_create_user(db_session, setup_test_db):
+async def test_create_user(db_session):
     """Test creating a user"""
     user_repo = UserRepository(db_session)
 
@@ -47,7 +47,7 @@ async def test_create_user(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_get_user(db_session, setup_test_db):
+async def test_get_user(db_session):
     """Test getting a user by criteria"""
     user_repo = UserRepository(db_session)
 
@@ -60,7 +60,7 @@ async def test_get_user(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_update_user(db_session, setup_test_db):
+async def test_update_user(db_session):
     """Test updating a user"""
     user_repo = UserRepository(db_session)
 
@@ -75,7 +75,7 @@ async def test_update_user(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_delete_user(db_session, setup_test_db):
+async def test_delete_user(db_session):
     """Test deleting a user"""
     user_repo = UserRepository(db_session)
 
@@ -89,7 +89,7 @@ async def test_delete_user(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_paginate(db_session, setup_test_db):
+async def test_paginate(db_session):
     """Test pagination functionality"""
     user_repo = UserRepository(db_session)
     set_params(Params(size=10, page=1))
@@ -106,7 +106,7 @@ async def test_paginate(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_all_users(db_session, setup_test_db):
+async def test_all_users(db_session):
     """Test getting all users with pagination"""
     user_repo = UserRepository(db_session)
 
@@ -121,7 +121,7 @@ async def test_all_users(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_filter_users(db_session, setup_test_db):
+async def test_filter_users(db_session):
     """Test filtering users with the f() method"""
     user_repo = UserRepository(db_session)
 
@@ -137,7 +137,7 @@ async def test_filter_users(db_session, setup_test_db):
 
 
 @pytest.mark.asyncio
-async def test_get_or_create(db_session, setup_test_db):
+async def test_get_or_create(db_session):
     """Test get_or_create functionality"""
     user_repo = UserRepository(db_session)
 
