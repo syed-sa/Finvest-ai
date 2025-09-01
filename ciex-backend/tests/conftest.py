@@ -9,7 +9,7 @@ from src.core.config import settings
 
 
 async_test_engine = create_async_engine(
-    settings.POSTGRES_URL,  # Consider using a TEST_POSTGRES_URL instead
+    settings.POSTGRES_URL,  # type: ignore
     echo=settings.DEBUG,
 )
 AsyncTestSessionLocal = async_sessionmaker(
