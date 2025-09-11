@@ -9,3 +9,9 @@ class BaseEnum(str, Enum):
 class SortOrder(BaseEnum):
     ASC = "asc"
     DESC = "desc"
+
+
+class Environment(BaseEnum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
