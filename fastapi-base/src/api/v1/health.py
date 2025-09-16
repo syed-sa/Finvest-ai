@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from src.core.config import settings
 
+
 router = APIRouter()
 
 
