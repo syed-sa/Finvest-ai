@@ -1,24 +1,22 @@
 from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
 from fastapi_cache.decorator import cache
+from pydantic import BaseModel
 
 from src.core.config import settings
 
 router = APIRouter()
 
 
-class HealthCheckResponse(JSONResponse):
+class HealthCheckResponse(BaseModel):
     status: str = "ok"
 
 
-@router.get(
-    "/ping", tags=["health"], status_code=status.HTTP_200_OK, response_model=HealthCheckResponse
-)
+@router.get("/ping", tags=["health"], status_code=status.HTTP_200_OK)
 @cache(expire=settings.CACHE_TTL)  # type: ignore
 def pong() -> HealthCheckResponse:
     # some async operation could happen here
     # example: `data = await get_all_datas()`
-    return HealthCheckResponse(content={"ping": "pong!"}, status_code=status.HTTP_200_OK)
+    return HealthCheckResponse()
 
 
 # # Example route
