@@ -18,7 +18,7 @@ def get_redis_client() -> Redis:
         encoding="utf8",
         decode_responses=True,
     )
-    return cast(Redis, redis)
+    return cast(Redis, redis)  # type: ignore
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

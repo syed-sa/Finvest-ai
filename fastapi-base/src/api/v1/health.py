@@ -1,15 +1,24 @@
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse, Response
+from fastapi import APIRouter, status
+from fastapi.responses import JSONResponse
+from fastapi_cache.decorator import cache
 
+from src.core.config import settings
 
 router = APIRouter()
 
 
-@router.get("/ping", tags=["health"])
-def pong() -> Response:
+class HealthCheckResponse(JSONResponse):
+    status: str = "ok"
+
+
+@router.get(
+    "/ping", tags=["health"], status_code=status.HTTP_200_OK, response_model=HealthCheckResponse
+)
+@cache(expire=settings.CACHE_TTL)  # type: ignore
+def pong() -> HealthCheckResponse:
     # some async operation could happen here
     # example: `data = await get_all_datas()`
-    return JSONResponse({"ping": "pong!"})
+    return HealthCheckResponse(content={"ping": "pong!"}, status_code=status.HTTP_200_OK)
 
 
 # # Example route

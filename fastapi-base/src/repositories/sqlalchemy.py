@@ -9,7 +9,6 @@ from sqlmodel import SQLModel, select
 from src.core.exceptions import ObjectNotFound
 from src.interfaces.repository import IRepository
 
-
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=SQLModel)
@@ -211,7 +210,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         """
         obj = await self.get(**kwargs)
 
-        await self.db.delete(obj)  # type: ignore
+        await self.db.delete(obj)
         await self.db.commit()
 
     def _get_order_by(
@@ -308,7 +307,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         order_by = self._get_order_by(sort_field, sort_order)
         query = select(self._model).order_by(order_by)  # type: ignore
 
-        return await apaginate(self.db, query)
+        return await apaginate(self.db, query)  # type: ignore
 
     async def f(self, **kwargs: Any) -> List[ModelType]:
         """
