@@ -4,3 +4,7 @@ class BaseBackendException(Exception):
 
 class ObjectNotFound(BaseBackendException):
     pass
+
+
+class RepositoryError(BaseBackendException):
+    pass
