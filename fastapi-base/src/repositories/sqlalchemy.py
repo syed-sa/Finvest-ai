@@ -1,14 +1,16 @@
 import logging
-from typing import Any, Generic, List, Optional, Type, TypeVar
+from datetime import datetime, timezone
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
 
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import apaginate
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import SQLModel, select
 
-from src.core.exceptions import ObjectNotFound
+from src.core.exceptions import ObjectNotFound, RepositoryError
 from src.interfaces.repository import IRepository
-
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
@@ -27,45 +29,12 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         ModelType: The SQLModel database model class
         CreateSchemaType: The Pydantic model for creating new objects
         UpdateSchemaType: The Pydantic model for updating existing objects
-
-    Example:
-        >>> from sqlmodel import SQLModel, Field
-        >>> from pydantic import BaseModel
-        >>>
-        >>> class User(SQLModel, table=True):
-        ...     id: int = Field(primary_key=True)
-        ...     name: str
-        ...     email: str
-        ...
-        >>> class UserCreate(BaseModel):
-        ...     name: str
-        ...     email: str
-        ...
-        >>> class UserUpdate(BaseModel):
-        ...     name: Optional[str] = None
-        ...     email: Optional[str] = None
-        ...
-        >>> class UserRepository(BaseSQLAlchemyRepository[User, UserCreate, UserUpdate]):
-        ...     _model = User
-        ...
-        >>> # Usage
-        >>> user_repo = UserRepository(async_db_session)
-        >>> new_user = await user_repo.create(UserCreate(name="John", email="john@example.com"))
     """
 
     _model: Type[ModelType]
 
     def __init__(self, db: AsyncSession) -> None:
-        """
-        Initialize the repository with a database session.
-
-        Args:
-            db: SQLAlchemy async database session
-
-        Example:
-            >>> from sqlalchemy.ext.asyncio import AsyncSession
-            >>> user_repo = UserRepository(async_db_session)
-        """
+        """Initialize the repository with a database session."""
         self.db = db
 
     async def create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
@@ -78,85 +47,144 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
                 - add (bool): Whether to add the object to the session (default: True)
                 - flush (bool): Whether to flush the session (default: True)
                 - commit (bool): Whether to commit the transaction (default: True)
+                - refresh (bool): Whether to refresh after commit (default: True)
 
         Returns:
             The created database object
 
         Raises:
-            Exception: If database operation fails, rolls back the transaction
-
-        Example:
-            >>> user_data = UserCreate(name="Alice", email="alice@example.com")
-            >>> new_user = await user_repo.create(user_data)
-            >>> print(new_user.id)  # Auto-generated ID
-
-            >>> # Create without committing (useful for batch operations)
-            >>> user = await user_repo.create(user_data, commit=False)
+            RepositoryError: If database operation fails
         """
-        logger.info(f"Inserting new object[{obj_in.__class__.__name__}]")
+        logger.info(f"Creating new {self._model.__name__} object")
 
-        db_obj = self._model.model_validate(obj_in)
-        add = kwargs.get("add", True)
-        flush = kwargs.get("flush", True)
-        commit = kwargs.get("commit", True)
+        try:
+            db_obj = self._model.model_validate(obj_in)
 
-        if add:
-            self.db.add(db_obj)
+            add = kwargs.get("add", True)
+            flush = kwargs.get("flush", True)
+            commit = kwargs.get("commit", True)
+            refresh = kwargs.get("refresh", True)
 
-        # Navigate these with caution
-        if add and commit:
-            try:
+            if add:
+                self.db.add(db_obj)
+
+            if add and commit:
                 await self.db.commit()
-                await self.db.refresh(db_obj)
-            except Exception as exc:
-                logger.error(exc)
-                await self.db.rollback()
+                if refresh:
+                    await self.db.refresh(db_obj)
+            elif add and flush:
+                await self.db.flush()
 
-        elif add and flush:
-            await self.db.flush()
+            return db_obj
 
-        return db_obj
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to create {self._model.__name__}: {exc}")
+            await self.db.rollback()
+            raise RepositoryError(f"Failed to create object: {str(exc)}") from exc
 
-    async def get(self, **kwargs: Any) -> Optional[ModelType]:
+    async def create_many(self, objects: List[CreateSchemaType]) -> List[ModelType]:
+        """
+        Create multiple objects in a single transaction.
+
+        Args:
+            objects: List of create schemas
+
+        Returns:
+            List of created database objects
+
+        Raises:
+            RepositoryError: If database operation fails
+        """
+        if not objects:
+            return []
+
+        logger.info(f"Creating {len(objects)} {self._model.__name__} objects")
+
+        try:
+            db_objects = [self._model.model_validate(obj) for obj in objects]
+            self.db.add_all(db_objects)
+            await self.db.commit()
+
+            # Refresh all objects
+            for obj in db_objects:
+                await self.db.refresh(obj)
+
+            return db_objects
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to create multiple {self._model.__name__}: {exc}")
+            await self.db.rollback()
+            raise RepositoryError(f"Failed to create objects: {str(exc)}") from exc
+
+    async def get(self, raise_if_not_found: bool = True, **kwargs: Any) -> Optional[ModelType]:
         """
         Get a single object by filter criteria.
 
         Args:
+            raise_if_not_found: Whether to raise exception if object not found
             **kwargs: Filter criteria as key-value pairs
 
         Returns:
             The found object or None
 
         Raises:
-            ObjectNotFound: If no object matches the criteria
-
-        Example:
-            >>> # Get user by ID
-            >>> user = await user_repo.get(id=1)
-
-            >>> # Get user by email
-            >>> user = await user_repo.get(email="john@example.com")
-
-            >>> # Get user by multiple criteria
-            >>> user = await user_repo.get(name="John", is_active=True)
+            ObjectNotFound: If no object matches the criteria and raise_if_not_found is True
         """
-        logger.info(f"Fetching [{self._model.__class__.__name__}] object by [{kwargs}]")
+        logger.debug(f"Fetching {self._model.__name__} by {kwargs}")
 
-        query = select(self._model).filter_by(**kwargs)  # type: ignore
-        response = await self.db.execute(query)
-        scalar: Optional[ModelType] = response.scalar_one_or_none()
+        try:
+            query = select(self._model).filter_by(**kwargs)  # type: ignore
+            result = await self.db.execute(query)
+            obj = result.scalar_one_or_none()
 
-        if not scalar:
-            raise ObjectNotFound(f"Object with [{kwargs}] not found.")
+            if not obj and raise_if_not_found:
+                raise ObjectNotFound(f"{self._model.__name__} with {kwargs} not found")
 
-        return scalar
+            return obj
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to get {self._model.__name__}: {exc}")
+            raise RepositoryError(f"Failed to get object: {str(exc)}") from exc
+
+    async def get_with_relations(
+        self, relations: List[str], raise_if_not_found: bool = True, **kwargs: Any
+    ) -> Optional[ModelType]:
+        """
+        Get a single object with its relationships loaded.
+
+        Args:
+            relations: List of relationship names to load
+            raise_if_not_found: Whether to raise exception if object not found
+            **kwargs: Filter criteria as key-value pairs
+
+        Returns:
+            The found object with loaded relationships or None
+        """
+        logger.debug(f"Fetching {self._model.__name__} with relations {relations}")
+
+        try:
+            query = select(self._model).filter_by(**kwargs)  # type: ignore
+
+            # Add selectinload for each relation
+            for relation in relations:
+                if hasattr(self._model, relation):
+                    query = query.options(selectinload(getattr(self._model, relation)))
+
+            result = await self.db.execute(query)
+            obj = result.scalar_one_or_none()
+
+            if not obj and raise_if_not_found:
+                raise ObjectNotFound(f"{self._model.__name__} with {kwargs} not found")
+
+            return obj
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to get {self._model.__name__} with relations: {exc}")
+            raise RepositoryError(f"Failed to get object with relations: {str(exc)}") from exc
 
     async def update(self, obj_current: ModelType, obj_in: UpdateSchemaType) -> ModelType:
         """
         Update an existing object in the database.
-
-        Only fields that are explicitly set in the update schema will be modified.
-        Unset fields are ignored to support partial updates.
 
         Args:
             obj_current: The current database object to update
@@ -165,32 +193,46 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         Returns:
             The updated database object
 
-        Example:
-            >>> # Get existing user
-            >>> user = await user_repo.get(id=1)
-
-            >>> # Update only the name (email remains unchanged)
-            >>> update_data = UserUpdate(name="John Smith")
-            >>> updated_user = await user_repo.update(user, update_data)
-
-            >>> # Update multiple fields
-            >>> update_data = UserUpdate(name="Jane", email="jane@example.com")
-            >>> updated_user = await user_repo.update(user, update_data)
+        Raises:
+            RepositoryError: If database operation fails
         """
-        logger.info(f"Updating [{self._model.__class__.__name__}] object with [{obj_in}]")
+        logger.info(f"Updating {self._model.__name__} object")
 
-        update_data = obj_in.model_dump(
-            exclude_unset=True
-        )  # This tells Pydantic to not include the values that were not sent
+        try:
+            update_data = obj_in.model_dump(exclude_unset=True)
 
-        for field in update_data:
-            setattr(obj_current, field, update_data[field])
+            for field, value in update_data.items():
+                setattr(obj_current, field, value)
 
-        self.db.add(obj_current)
-        await self.db.commit()
-        await self.db.refresh(obj_current)
+            self.db.add(obj_current)
+            await self.db.commit()
+            await self.db.refresh(obj_current)
 
-        return obj_current
+            return obj_current
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to update {self._model.__name__}: {exc}")
+            await self.db.rollback()
+            raise RepositoryError(f"Failed to update object: {str(exc)}") from exc
+
+    async def update_by_id(self, obj_id: Any, obj_in: UpdateSchemaType) -> ModelType:
+        """
+        Update an object by its ID.
+
+        Args:
+            obj_id: The ID of the object to update
+            obj_in: The update schema containing the new data
+
+        Returns:
+            The updated database object
+
+        Raises:
+            ObjectNotFound: If no object with the given ID exists
+        """
+        obj = await self.get(id=obj_id)
+        if obj is None:
+            raise ObjectNotFound(f"{self._model.__name__} with id {obj_id} not found")
+        return await self.update(obj, obj_in)
 
     async def delete(self, **kwargs: Any) -> None:
         """
@@ -201,43 +243,89 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Raises:
             ObjectNotFound: If no object matches the criteria
-
-        Example:
-            >>> # Delete user by ID
-            >>> await user_repo.delete(id=1)
-
-            >>> # Delete user by email
-            >>> await user_repo.delete(email="user@example.com")
+            RepositoryError: If database operation fails
         """
-        obj = await self.get(**kwargs)
+        logger.info(f"Deleting {self._model.__name__} with {kwargs}")
 
-        await self.db.delete(obj)  # type: ignore
+        try:
+            obj = await self.get(**kwargs)
+            await self.db.delete(obj)
+            await self.db.commit()
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to delete {self._model.__name__}: {exc}")
+            await self.db.rollback()
+            raise RepositoryError(f"Failed to delete object: {str(exc)}") from exc
+
+    async def delete_by_id(self, obj_id: Any) -> None:
+        """Delete an object by its ID."""
+        await self.delete(id=obj_id)
+
+    async def soft_delete(self, obj_id: Any, deleted_field: str = "deleted_at") -> ModelType:
+        """
+        Perform a soft delete by setting a boolean flag.
+
+        Args:
+            obj_id: The ID of the object to soft delete
+            deleted_field: The name of the boolean field to set (default: 'deleted_at')
+
+        Returns:
+            The soft-deleted object
+        """
+        obj = await self.get(id=obj_id)
+        if obj is None:
+            raise ObjectNotFound(f"{self._model.__name__} with id {obj_id} not found")
+
+        # set deleted_at to current timestamp
+        if hasattr(obj, deleted_field):
+            setattr(obj, deleted_field, datetime.now(timezone.utc))
+
+        self.db.add(obj)
         await self.db.commit()
+        await self.db.refresh(obj)
+
+        return obj
+
+    async def exists(self, **kwargs: Any) -> bool:
+        """
+        Check if an object exists with the given criteria.
+
+        Args:
+            **kwargs: Filter criteria as key-value pairs
+
+        Returns:
+            True if object exists, False otherwise
+        """
+        obj = await self.get(raise_if_not_found=False, **kwargs)
+        return obj is not None
+
+    async def count(self, **kwargs: Any) -> int:
+        """
+        Count objects matching the given criteria.
+
+        Args:
+            **kwargs: Filter criteria as key-value pairs
+
+        Returns:
+            Number of matching objects
+        """
+        from sqlalchemy import func
+
+        query = select(func.count(self._model.id)).filter_by(**kwargs)  # type: ignore
+        result = await self.db.execute(query)
+        return result.scalar() or 0
 
     def _get_order_by(
         self, sort_field: Optional[str] = None, sort_order: Optional[str] = None
     ) -> Any:
-        """
-        Get the order by clause for queries.
-
-        Args:
-            sort_field: Field name to sort by (defaults to 'created_at')
-            sort_order: Sort direction, 'asc' or 'desc' (defaults to 'desc')
-
-        Returns:
-            SQLAlchemy order by clause
-
-        Note:
-            If sort_field doesn't exist in the model, defaults to 'created_at'.
-            If sort_order is invalid, defaults to 'desc'.
-        """
+        """Get the order by clause for queries."""
         columns = self._model.__table__.columns
 
         if sort_field and sort_field not in columns:
-            sort_field = None
+            sort_field = "created_at" if hasattr(self._model, "created_at") else "id"
 
         if not sort_field:
-            sort_field = "created_at"
+            sort_field = "created_at" if "created_at" in columns else "id"
 
         if sort_order not in ["asc", "desc"]:
             sort_order = "desc"
@@ -251,126 +339,165 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         limit: int = 100,
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = None,
+        filters: Optional[Dict[str, Any]] = None,
     ) -> List[ModelType]:
         """
-        Get a list of all objects with optional pagination and sorting.
+        Get a list of all objects with optional pagination, sorting, and filtering.
 
         Args:
             skip: Number of records to skip (for pagination)
             limit: Maximum number of records to return
-            sort_field: Field name to sort by (defaults to 'created_at')
-            sort_order: Sort direction, 'asc' or 'desc' (defaults to 'desc')
+            sort_field: Field name to sort by
+            sort_order: Sort direction, 'asc' or 'desc'
+            filters: Additional filter criteria
 
         Returns:
             List of database objects
-
-        Example:
-            >>> # Get first 10 users
-            >>> users = await user_repo.all(limit=10)
-
-            >>> # Get users 20-30, sorted by name ascending
-            >>> users = await user_repo.all(skip=20, limit=10, sort_field="name", sort_order="asc")
-
-            >>> # Get all users (up to default limit of 100)
-            >>> all_users = await user_repo.all()
         """
-        order_by = self._get_order_by(sort_field, sort_order)
-        query = select(self._model).offset(skip).limit(limit).order_by(order_by)  # type: ignore
+        try:
+            order_by = self._get_order_by(sort_field, sort_order)
+            query = select(self._model).offset(skip).limit(limit).order_by(order_by)  # type: ignore
 
-        response = await self.db.execute(query)
-        return response.scalars().all()  # type: ignore
+            if filters:
+                query = query.filter_by(**filters)  # type: ignore
+
+            result = await self.db.execute(query)
+            return result.scalars().all()
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to get all {self._model.__name__}: {exc}")
+            raise RepositoryError(f"Failed to get objects: {str(exc)}") from exc
 
     async def paginate(
         self,
         sort_field: Optional[str] = None,
         sort_order: Optional[str] = None,
+        filters: Optional[Dict[str, Any]] = None,
     ) -> Page[ModelType]:
         """
         Get paginated results using fastapi-pagination.
 
         Args:
-            sort_field: Field name to sort by (defaults to 'created_at')
-            sort_order: Sort direction, 'asc' or 'desc' (defaults to 'desc')
+            sort_field: Field name to sort by
+            sort_order: Sort direction, 'asc' or 'desc'
+            filters: Additional filter criteria
 
         Returns:
             Page object containing paginated results and metadata
-
-        Example:
-            >>> # Get paginated users (page size determined by fastapi-pagination settings)
-            >>> page = await user_repo.paginate()
-            >>> print(f"Total: {page.total}, Page: {page.page}")
-            >>> for user in page.items:
-            ...     print(user.name)
-
-            >>> # Paginate with custom sorting
-            >>> page = await user_repo.paginate(sort_field="email", sort_order="asc")
         """
-        order_by = self._get_order_by(sort_field, sort_order)
-        query = select(self._model).order_by(order_by)  # type: ignore
+        try:
+            order_by = self._get_order_by(sort_field, sort_order)
+            query = select(self._model).order_by(order_by)  # type: ignore
 
-        return await apaginate(self.db, query)
+            if filters:
+                query = query.filter_by(**filters)  # type: ignore
 
-    async def f(self, **kwargs: Any) -> List[ModelType]:
+            return await apaginate(self.db, query)
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to paginate {self._model.__name__}: {exc}")
+            raise RepositoryError(f"Failed to paginate objects: {str(exc)}") from exc
+
+    async def filter_by(
+        self,
+        filters: Dict[str, Any],
+        sort_field: Optional[str] = None,
+        sort_order: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[ModelType]:
         """
-        Find all objects matching the given filter criteria.
-
-        This method returns all matching objects without pagination limits,
-        unlike the 'all' method which has built-in pagination.
+        Filter objects by multiple criteria with advanced filtering support.
 
         Args:
-            **kwargs: Filter criteria as key-value pairs
+            filters: Dictionary of field: value pairs for filtering
+            sort_field: Field name to sort by
+            sort_order: Sort direction
+            limit: Maximum number of results
 
         Returns:
-            List of all matching database objects
-
-        Example:
-            >>> # Find all active users
-            >>> active_users = await user_repo.f(is_active=True)
-
-            >>> # Find all users with specific role
-            >>> admins = await user_repo.f(role="admin")
-
-            >>> # Find users by multiple criteria
-            >>> verified_users = await user_repo.f(is_verified=True, is_active=True)
+            List of filtered objects
         """
-        logger.info(f"Fetching [{self._model.__class__.__name__}] object by [{kwargs}]")
+        try:
+            query = select(self._model)  # type: ignore
 
-        query = select(self._model).filter_by(**kwargs)  # type: ignore
-        response = await self.db.execute(query)
-        scalars: List[ModelType] = response.scalars().all()
+            # Apply filters
+            for field, value in filters.items():
+                if hasattr(self._model, field):
+                    if isinstance(value, list):
+                        # Handle IN clause
+                        query = query.where(getattr(self._model, field).in_(value))
+                    elif isinstance(value, dict) and "operator" in value:
+                        # Handle complex operators
+                        column = getattr(self._model, field)
+                        operator = value["operator"]
+                        val = value["value"]
 
-        return scalars
+                        if operator == "gt":
+                            query = query.where(column > val)
+                        elif operator == "gte":
+                            query = query.where(column >= val)
+                        elif operator == "lt":
+                            query = query.where(column < val)
+                        elif operator == "lte":
+                            query = query.where(column <= val)
+                        elif operator == "like":
+                            query = query.where(column.like(f"%{val}%"))
+                        elif operator == "ilike":
+                            query = query.where(column.ilike(f"%{val}%"))
+                    else:
+                        # Simple equality
+                        query = query.where(getattr(self._model, field) == value)
 
-    async def get_or_create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
+            # Apply sorting
+            if sort_field or sort_order:
+                order_by = self._get_order_by(sort_field, sort_order)
+                query = query.order_by(order_by)
+
+            # Apply limit
+            if limit:
+                query = query.limit(limit)
+
+            result = await self.db.execute(query)
+            return result.scalars().all()
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to filter {self._model.__name__}: {exc}")
+            raise RepositoryError(f"Failed to filter objects: {str(exc)}") from exc
+
+    async def get_or_create(
+        self, obj_in: CreateSchemaType, defaults: Optional[Dict[str, Any]] = None, **kwargs: Any
+    ) -> tuple[ModelType, bool]:
         """
         Get an existing object or create it if it doesn't exist.
 
-        This method first attempts to find an object matching the given criteria.
-        If found, it returns the existing object. If not found, it creates a new
-        object using the provided create schema.
-
         Args:
             obj_in: The create schema for the new object
+            defaults: Default values to use when creating (merged with obj_in)
             **kwargs: Filter criteria to search for existing object
 
         Returns:
-            Either the existing object or the newly created object
-
-        Example:
-            >>> # Get or create user by email
-            >>> user_data = UserCreate(name="Bob", email="bob@example.com")
-            >>> user = await user_repo.get_or_create(user_data, email="bob@example.com")
-
-            >>> # This will return the same user if called again
-            >>> same_user = await user_repo.get_or_create(user_data, email="bob@example.com")
-            >>> assert user.id == same_user.id
+            Tuple of (object, created) where created is True if object was created
         """
         try:
-            get_instance: Optional[ModelType] = await self.get(**kwargs)
+            existing_obj = await self.get(raise_if_not_found=False, **kwargs)
 
-            if get_instance:
-                return get_instance
-        except ObjectNotFound:
-            instance: ModelType = await self.create(obj_in)
+            if existing_obj:
+                return existing_obj, False
 
-        return instance
+            # Merge defaults if provided
+            if defaults:
+                create_data = obj_in.model_dump()
+                create_data.update(defaults)
+                obj_in = type(obj_in)(**create_data)
+
+            new_obj = await self.create(obj_in)
+            return new_obj, True
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed get_or_create for {self._model.__name__}: {exc}")
+            raise RepositoryError(f"Failed to get or create object: {str(exc)}") from exc
+
+    # Alias for backward compatibility
+    async def f(self, **kwargs: Any) -> List[ModelType]:
+        """Find all objects matching the given filter criteria."""
+        return await self.filter_by(kwargs)

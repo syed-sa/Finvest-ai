@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     LOG_LEVEL: int = Field(default=logging.INFO)
 
+    # Cache
+    CACHE_TTL: int = Field(default=60)  # seconds
+
     VERSION: str = Field(default="v1")
     DEBUG: bool = Field(default=True)
 

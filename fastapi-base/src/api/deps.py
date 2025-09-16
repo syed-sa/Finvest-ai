@@ -1,6 +1,6 @@
-from typing import AsyncGenerator, cast
+from typing import AsyncGenerator
 
-from redis import Redis
+import redis.asyncio as Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
@@ -11,14 +11,14 @@ def get_redis_url() -> str:
     return settings.REDIS_URL or ""
 
 
-def get_redis_client() -> Redis:
-    redis = Redis.from_url(
+async def get_redis_client() -> Redis.Redis:
+    redis = await Redis.from_url(
         get_redis_url(),
         max_connections=10,
         encoding="utf8",
         decode_responses=True,
     )
-    return cast(Redis, redis)
+    return redis
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
