@@ -72,7 +72,7 @@ async def test_create_many(db_session):
 
 @pytest.mark.asyncio
 async def test_get_not_found(db_session):
-    """Test getting a instance that does not exist"""
+    """Test getting an instance that does not exist"""
     base_repo = BaseTestRepository(db_session)
 
     with pytest.raises(ObjectNotFound):
