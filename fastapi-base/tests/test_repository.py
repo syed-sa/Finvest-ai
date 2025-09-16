@@ -153,7 +153,7 @@ async def test_delete_by_id(db_session):
 
 
 @pytest.mark.asyncio
-async def test_sofdelete_by_id(db_session):
+async def test_soft_delete_by_id(db_session):
     """Test soft deleting a user by ID"""
     base_repo = BaseTestRepository(db_session)
 
