@@ -1,7 +1,7 @@
 from typing import Any, Optional, Tuple
 
 import redis.asyncio as redis  # Changed from aioredis
-from fastapi_cache.backends import Backend
+from fastapi_cache.backends import Backend  # type: ignore
 
 
 class RedisBackend(Backend):
@@ -9,13 +9,13 @@ class RedisBackend(Backend):
         self.redis = redis_client
 
     async def get_with_ttl(self, key: str) -> Tuple[int, Optional[Any]]:
-        # redis-py pipeline syntax is slightly different
-        async with self.redis.pipeline(transaction=True) as pipe:
-            pipe.ttl(key)
-            pipe.get(key)
-            results = await pipe.execute()
-            ttl, value = results[0], results[1]
-            return ttl, value
+        # redis-py async pipeline doesn't use context manager
+        pipe = self.redis.pipeline(transaction=True)
+        pipe.ttl(key)
+        pipe.get(key)
+        results = await pipe.execute()
+        ttl, value = results[0], results[1]
+        return ttl, value
 
     async def get(self, key: str) -> Optional[Any]:
         return await self.redis.get(key)
