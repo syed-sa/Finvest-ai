@@ -1,6 +1,8 @@
 # FastAPI Base Project
 
-[🇧🇷 Português](docs/README-pt.md)
+<p align="center">
+  <a href="docs/README-pt.md">🇧🇷 Português</a>
+</p>
 
 <p align="center">
     <a href="https://github.com/GabrielVGS/fastapi-base/actions">

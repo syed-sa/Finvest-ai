@@ -1,7 +1,7 @@
 # Projeto Base FastAPI
-
-[🇺🇸 English](README.md)
-
+<p align="center">
+    <a href="README.md">🇺🇸 English</a>
+</p>
 <p align="center">
     <a href="https://github.com/GabrielVGS/fastapi-base/actions">
         <img alt="Status do GitHub Actions" src="https://github.com/GabrielVGS/fastapi-base/actions/workflows/main.yml/badge.svg">
