@@ -1,7 +1,7 @@
 # Projeto Base FastAPI
-
-[🇺🇸 English](README.md)
-
+<p align="center">
+    <a href="README.md">🇺🇸 English</a>
+</p>
 <p align="center">
     <a href="https://github.com/GabrielVGS/fastapi-base/actions">
         <img alt="Status do GitHub Actions" src="https://github.com/GabrielVGS/fastapi-base/actions/workflows/main.yml/badge.svg">
@@ -21,7 +21,7 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 ## 📚 Documentação
 
 - [Arquitetura](docs/architecture.md) - Visão geral da arquitetura do sistema
-- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local CIEX
+- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local
 
 ## 🚀 Início Rápido
 

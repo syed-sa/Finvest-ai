@@ -1,6 +1,8 @@
 # FastAPI Base Project
 
-[🇧🇷 Português](docs/README-pt.md)
+<p align="center">
+  <a href="docs/README-pt.md">🇧🇷 Português</a>
+</p>
 
 <p align="center">
     <a href="https://github.com/GabrielVGS/fastapi-base/actions">
@@ -21,7 +23,7 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 ## 📚 Documentation
 
 - [Architecture](docs/architecture.md) - System architecture overview
-- [Development](docs/developing.md) - CIEX local development guide
+- [Development](docs/developing.md) - local development guide
 
 ## 🚀 Quick Start
 
