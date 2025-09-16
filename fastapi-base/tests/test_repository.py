@@ -2,6 +2,7 @@ from typing import Optional
 
 import pytest
 from fastapi_pagination import Params, set_params
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, SQLModel
 
 from src.core.exceptions import ObjectNotFound
@@ -36,7 +37,7 @@ class BaseTestRepository(BaseSQLAlchemyRepository[BaseTest, BaseTestCreate, Base
 
 
 @pytest.mark.asyncio
-async def test_create_user(db_session):
+async def test_create_user(db_session: AsyncSession) -> None:
     """Test creating a user"""
     user_repo = BaseTestRepository(db_session)
 
@@ -50,7 +51,7 @@ async def test_create_user(db_session):
 
 
 @pytest.mark.asyncio
-async def test_get_user(db_session):
+async def test_get_user(db_session: AsyncSession) -> None:
     """Test getting a user by criteria"""
     user_repo = BaseTestRepository(db_session)
 
@@ -58,12 +59,15 @@ async def test_get_user(db_session):
     created_user = await user_repo.create(user_data)
 
     found_user = await user_repo.get(email="jane@example.com")
+    if not found_user:
+        raise AssertionError("User not found")
+
     assert found_user.id == created_user.id
     assert found_user.name == "Jane Doe"
 
 
 @pytest.mark.asyncio
-async def test_update_user(db_session):
+async def test_update_user(db_session: AsyncSession) -> None:
     """Test updating a user"""
     user_repo = BaseTestRepository(db_session)
 
@@ -78,7 +82,7 @@ async def test_update_user(db_session):
 
 
 @pytest.mark.asyncio
-async def test_delete_user(db_session):
+async def test_delete_user(db_session: AsyncSession) -> None:
     """Test deleting a user"""
     user_repo = BaseTestRepository(db_session)
 
@@ -92,7 +96,7 @@ async def test_delete_user(db_session):
 
 
 @pytest.mark.asyncio
-async def test_paginate(db_session):
+async def test_paginate(db_session: AsyncSession) -> None:
     """Test pagination functionality"""
     user_repo = BaseTestRepository(db_session)
     set_params(Params(size=10, page=1))
@@ -109,7 +113,7 @@ async def test_paginate(db_session):
 
 
 @pytest.mark.asyncio
-async def test_all_users(db_session):
+async def test_all_users(db_session: AsyncSession) -> None:
     """Test getting all users with pagination"""
     user_repo = BaseTestRepository(db_session)
 
@@ -124,7 +128,7 @@ async def test_all_users(db_session):
 
 
 @pytest.mark.asyncio
-async def test_filter_users(db_session):
+async def test_filter_users(db_session: AsyncSession) -> None:
     """Test filtering users with the f() method"""
     user_repo = BaseTestRepository(db_session)
 
@@ -142,7 +146,7 @@ async def test_filter_users(db_session):
 
 
 @pytest.mark.asyncio
-async def test_get_or_create(db_session):
+async def test_get_or_create(db_session: AsyncSession) -> None:
     """Test get_or_create functionality"""
     user_repo = BaseTestRepository(db_session)
 
@@ -155,7 +159,7 @@ async def test_get_or_create(db_session):
     assert user1.id == user2.id
 
 
-def test_repository_initialization(db_session):
+def test_repository_initialization(db_session: AsyncSession) -> None:
     """Test that repository can be initialized properly"""
     user_repo = BaseTestRepository(db_session)
 
