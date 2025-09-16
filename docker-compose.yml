@@ -1,9 +1,9 @@
 volumes:
   base-data:
-  ciex-db-data:
+  db-data:
   redis-data:
 services:
-  ciex-db:
+  db:
     image: postgres:15-alpine
     env_file:
       - .env
@@ -16,14 +16,14 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ciex-db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
 
-  ciex-backend:
+  fastapi-base:
     restart: always
     env_file:
       - .env
     build:
-      context: ./ciex-backend
+      context: ./fastapi-base
       dockerfile: ./Dockerfile
       args:
         env: ${ENV}
@@ -39,10 +39,10 @@ services:
       - PYTHONUNBUFFERED=0
     volumes:
       - base-data:/data
-      - ./ciex-backend/src:/code/src
-      - ./ciex-backend/tests:/code/tests
-      - ./ciex-backend/alembic.ini:/code/alembic.ini
-      - ./ciex-backend/logconfig.yml:/code/logconfig.yml
+      - ./fastapi-base/src:/code/src
+      - ./fastapi-base/tests:/code/tests
+      - ./fastapi-base/alembic.ini:/code/alembic.ini
+      - ./fastapi-base/logconfig.yml:/code/logconfig.yml
   redis:
     restart: always
     image: redis:7-alpine
@@ -50,19 +50,19 @@ services:
       - redis-data:/data
   celery:
     restart: always
-    build: ./ciex-backend
+    build: ./fastapi-base
     command: celery --app=src worker --loglevel=info
     env_file:
       - .env
     depends_on:
-      - ciex-backend
+      - fastapi-base
       - redis
   beat:
     restart: always
-    build: ./ciex-backend
+    build: ./fastapi-base
     command: celery --app=src beat --loglevel=info
     env_file:
       - .env
     depends_on:
-      - ciex-backend
+      - fastapi-base
       - redis

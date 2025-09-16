@@ -1,11 +1,11 @@
 <p align="center">
-    <a href="https://github.com/CIEX-FURG/ciex-backend/actions">
-        <img alt="Status do GitHub Actions" src="https://github.com/CIEX-FURG/ciex-backend/actions/workflows/main.yml/badge.svg">
+    <a href="https://github.com/CIEX-FURG/fastapi-base/actions">
+        <img alt="Status do GitHub Actions" src="https://github.com/CIEX-FURG/fastapi-base/actions/workflows/main.yml/badge.svg">
     </a>
-    <a href="https://codecov.io/gh/CIEX-FURG/ciex-backend" >
-     <img src="https://codecov.io/gh/CIEX-FURG/ciex-backend/branch/main/graph/badge.svg?token=899NB4AK7J"/>
+    <a href="https://codecov.io/gh/CIEX-FURG/fastapi-base" >
+     <img src="https://codecov.io/gh/CIEX-FURG/fastapi-base/branch/main/graph/badge.svg?token=899NB4AK7J"/>
     </a>
-    <a href="https://github.com/CIEX-FURG/ciex-backend/releases"><img alt="Status do Release" src="https://img.shields.io/github/v/release/CIEX-FURG/ciex-backend"></a>
+    <a href="https://github.com/CIEX-FURG/fastapi-base/releases"><img alt="Status do Release" src="https://img.shields.io/github/v/release/CIEX-FURG/fastapi-base"></a>
 
 </p>
 
@@ -30,7 +30,7 @@ $ make alembic-init
 
 Criar novo arquivo de migração
 ```shell
-$ docker compose exec ciex-backend alembic revision --autogenerate -m "algum comentário legal"
+$ docker compose exec fastapi-base alembic revision --autogenerate -m "algum comentário legal"
 ```
 
 Aplicar migrações
@@ -52,7 +52,7 @@ Consulte o [Makefile](/Makefile) para visualizar os comandos disponíveis.
 
 Por padrão, as dependências são gerenciadas com [uv](https://docs.astral.sh/uv/), acesse o link e instale-o.
 
-A partir de `./ciex-backend/` você pode instalar todas as dependências com:
+A partir de `./fastapi-base/` você pode instalar todas as dependências com:
 ```console
 $ uv sync
 ```

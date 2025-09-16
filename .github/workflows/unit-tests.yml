@@ -14,12 +14,12 @@ jobs:
       - name: Run unit tests
         run: |
           docker compose -f ops/docker-compose.test.yml up --detach --wait
-          docker compose -f ops/docker-compose.test.yml exec ciex-backend pytest --cov-report=xml:/data/coverage.xml --cov=src/ tests/
-          docker compose -f ops/docker-compose.test.yml exec ciex-backend pytest --cov=src/ tests/ --junitxml=/data/junit.xml -o junit_family=legacy
+          docker compose -f ops/docker-compose.test.yml exec fastapi-base pytest --cov-report=xml:/data/coverage.xml --cov=src/ tests/
+          docker compose -f ops/docker-compose.test.yml exec fastapi-base pytest --cov=src/ tests/ --junitxml=/data/junit.xml -o junit_family=legacy
       - name: Copy coverage and Junit file from container
         run: |
-          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/coverage.xml ./coverage.xml
-          docker compose -f ops/docker-compose.test.yml cp ciex-backend:/data/junit.xml ./junit.xml
+          docker compose -f ops/docker-compose.test.yml cp fastapi-base:/data/coverage.xml ./coverage.xml
+          docker compose -f ops/docker-compose.test.yml cp fastapi-base:/data/junit.xml ./junit.xml
       - name: Codecov
         if: success()
         uses: codecov/codecov-action@v5

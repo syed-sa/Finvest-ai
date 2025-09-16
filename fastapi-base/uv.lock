@@ -164,7 +164,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ciex-backend"
+name = "fastapi-base"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

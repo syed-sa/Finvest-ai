@@ -1,7 +1,7 @@
 services:
-  ciex-backend:
+  fastapi-base:
     build:
-      context: ../ciex-backend
+      context: ../fastapi-base
       dockerfile: ./Dockerfile
       args:
         env: "test"

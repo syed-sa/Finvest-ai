@@ -7,6 +7,6 @@ version: 2
 
 updates:
   - package-ecosystem: "uv"
-    directory: "./ciex-backend"
+    directory: "./fastapi-base"
     schedule:
       interval: "weekly"

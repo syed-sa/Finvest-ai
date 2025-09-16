@@ -15,55 +15,55 @@ build:
 
 bash:
 	@echo "connecting to container...."
-	docker compose exec ciex-backend bash
+	docker compose exec fastapi-base bash
 
 # alembic
 alembic-scaffold:
 	@echo "scaffolding migrations folder..."
-	docker compose exec ciex-backend alembic init migrations
+	docker compose exec fastapi-base alembic init migrations
 
 alembic-init:
 	@echo "initializing first migration...."
-	docker compose exec ciex-backend alembic revision --autogenerate -m "init"
+	docker compose exec fastapi-base alembic revision --autogenerate -m "init"
 
 alembic-make-migrations:
 	@read -p "Enter migration message: " comment; \
 	echo "Creating migration file: $$comment"; \
-	docker compose exec ciex-backend alembic revision --autogenerate -m "$$comment"
+	docker compose exec fastapi-base alembic revision --autogenerate -m "$$comment"
 
 alembic-migrate:
 	@echo "applying migration...."
-	docker compose exec ciex-backend alembic upgrade head
+	docker compose exec fastapi-base alembic upgrade head
 
 alembic-reset:
 	@echo "resetting database...."
-	docker compose exec ciex-backend alembic downgrade base
+	docker compose exec fastapi-base alembic downgrade base
 
 # lint
 test:
 	@echo "running pytest...."
-	docker compose exec ciex-backend pytest --cov-report xml --cov=src tests/
+	docker compose exec fastapi-base pytest --cov-report xml --cov=src tests/
 
 lint:
 	@echo "running ruff...."
-	docker compose exec ciex-backend ruff check src
+	docker compose exec fastapi-base ruff check src
 
 black:
 	@echo "running black...."
-	docker compose exec ciex-backend black .
+	docker compose exec fastapi-base black .
 
 isort:
 	@echo "running isort...."
-	docker compose exec ciex-backend isort .
+	docker compose exec fastapi-base isort .
 
 mypy:
 	@echo "running mypy...."
-	docker compose exec ciex-backend mypy src/
+	docker compose exec fastapi-base mypy src/
 
 # database
 init-db: alembic-init alembic-migrate
 	@echo "initializing database...."
-	docker compose exec ciex-backend python3 src/db/init_db.py
+	docker compose exec fastapi-base python3 src/db/init_db.py
 
 # misc
 check: BREW-exists

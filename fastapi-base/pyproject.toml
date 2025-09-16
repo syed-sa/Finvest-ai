@@ -1,10 +1,8 @@
 [project]
-name = "ciex-backend"
+name = "fastapi-base"
 version = "0.1.0"
-description = "CIEX Backend"
-maintainers = [
-    { name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com" },
-] # depois adicionem os emails e nomes aqui turma ;)
+description = "Base FastAPI Backend"
+maintainers = [{ name = "GabrielVGS", email = "gabriel.viana.rs@gmail.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
 dependencies = [
