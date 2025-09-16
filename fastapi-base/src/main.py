@@ -5,7 +5,7 @@ import sentry_sdk
 import yaml  # type: ignore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_cache import FastAPICache
+from fastapi_cache import FastAPICache  # type: ignore
 from fastapi_pagination import add_pagination
 
 from src.api import routes
