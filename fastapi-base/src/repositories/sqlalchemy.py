@@ -322,7 +322,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         columns = self._model.__table__.columns
 
         if sort_field and sort_field not in columns:
-            sort_field = getattr(self._model, "created_at", "id") and "created_at" or "id"
+            sort_field = "created_at" if hasattr(self._model, "created_at") else "id"
 
         if not sort_field:
             sort_field = "created_at" if "created_at" in columns else "id"
