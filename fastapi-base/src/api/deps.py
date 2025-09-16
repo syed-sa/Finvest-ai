@@ -11,13 +11,14 @@ def get_redis_url() -> str:
     return settings.REDIS_URL or ""
 
 
-def get_redis_client() -> Redis:
+async def get_redis_client() -> Redis:
     redis = Redis.from_url(
         get_redis_url(),
         max_connections=10,
         encoding="utf8",
         decode_responses=True,
     )
+    await redis.ping()  # ensure connection
     return cast(Redis, redis)  # type: ignore
 
 

@@ -6,14 +6,13 @@ import yaml  # type: ignore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from fastapi_pagination import add_pagination
 
 from src.api import routes
 from src.api.deps import get_redis_client
+from src.core.backends import RedisBackend
 from src.core.config import settings
 from src.db.session import add_postgresql_extension
-
 
 if settings.LOGGING_CONFIG_PATH.exists():
     with open(settings.LOGGING_CONFIG_PATH) as f:
@@ -43,7 +42,7 @@ app = FastAPI(
 
 async def on_startup() -> None:
     await add_postgresql_extension()
-    redis_client = get_redis_client()
+    redis_client = await get_redis_client()
 
     # Initialize FastAPI-Cache with Redis backend
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
