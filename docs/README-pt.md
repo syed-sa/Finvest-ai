@@ -34,17 +34,17 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 
 ### Migrações do Banco de Dados
 
-Inicializar a primeira migração (o projeto deve estar rodando com docker compose up e não conter arquivos de 'version'):
+Inicialize a primeira migração (o projeto deve estar rodando com docker compose up e não conter arquivos de 'version'):
 ```shell
 $ make alembic-init
 ```
 
-Criar novo arquivo de migração:
+Crie um novo arquivo de migração:
 ```shell
 $ docker compose exec fastapi-base alembic revision --autogenerate -m "algum comentário legal"
 ```
 
-Aplicar migrações:
+Aplique as migrações:
 ```shell
 $ make alembic-migrate
 ```
@@ -73,7 +73,7 @@ $ uv sync
 Se você ainda não fez isso, baixe o pacote do sistema [pre-commit](https://pre-commit.com/) e instale. Depois de concluído, instale os hooks do git com:
 ```console
 $ pre-commit install
-pre-commit installed at .git/hooks/pre-commit
+pre-commit instalado em .git/hooks/pre-commit
 ```
 
 ## 🤝 Contribuindo
@@ -83,3 +83,7 @@ Contribuições são bem-vindas! Fique à vontade para enviar um Pull Request.
 ## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo LICENSE para obter detalhes.
+
+## ⭐️ Apoie
+
+Se você achou este projeto útil, por favor considere deixar uma estrela no repositório!
