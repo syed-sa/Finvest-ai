@@ -18,7 +18,7 @@
 
 ## 🏗️ Project Template
 
-This project was created using the excellent [cookiecutter-fastapi-backend](https://github.com/nickatnight/cookiecutter-fastapi-backend) template, which provides a solid foundation for FastAPI applications with best practices and modern tooling.
+This project was created using the excellent [cookiecutter-fastapi-backend](https://github.com/nickatnight/cookiecutter-fastapi-backend) template by [@nickatnight](https://github.com/nickatnight), which provides a solid foundation for FastAPI applications with best practices and modern tooling.
 
 ## 📚 Documentation
 
