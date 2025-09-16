@@ -1,4 +1,4 @@
-# FastAPI Base Project / Projeto Base FastAPI
+# FastAPI Base Project
 
 [🇺🇸 English](#english) | [🇧🇷 Português](#português)
 
