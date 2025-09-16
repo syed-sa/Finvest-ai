@@ -14,20 +14,17 @@ class Test(BaseModel, table=True):
 
     email: str = Field(unique=True, index=True, max_length=255)
     name: str = Field(max_length=100)
-    password: str = Field(max_length=255)  # Should be hashed
 
 
 # For creating users (input validation)
 class TestCreate(SQLModel):
     email: str = Field(max_length=255)
     name: str = Field(max_length=100)
-    password: str = Field(min_length=8, max_length=255)
 
 
 class TestUpdate(SQLModel):
     email: Optional[str] = Field(default=None, max_length=255)
     name: Optional[str] = Field(default=None, max_length=100)
-    password: Optional[str] = Field(default=None, min_length=8, max_length=255)
 
 
 # Concrete Class for testing
