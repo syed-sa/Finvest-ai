@@ -1,4 +1,5 @@
-from typing import AsyncGenerator
+import asyncio
+from typing import AsyncGenerator, Callable
 
 import pytest_asyncio
 from sqlalchemy import text
@@ -7,7 +8,6 @@ from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.core.config import settings
-
 
 # Create test engine with NullPool to avoid connection conflicts
 async_test_engine = create_async_engine(
@@ -25,7 +25,7 @@ AsyncTestSessionLocal = async_sessionmaker(
 
 
 @pytest_asyncio.fixture(scope="session")
-async def setup_database():
+async def setup_database() -> AsyncGenerator[None, None]:
     """Setup database schema once per test session"""
     async with async_test_engine.begin() as connection:
         # Add PostgreSQL extension
@@ -43,7 +43,9 @@ async def setup_database():
 
 
 @pytest_asyncio.fixture
-async def db_session(setup_database) -> AsyncGenerator[AsyncSession, None]:
+async def db_session(
+    setup_database: Callable[[], AsyncGenerator[None, None]],
+) -> AsyncGenerator[AsyncSession, None]:
     """
     Create a test database session with proper cleanup.
     Each test gets a fresh session with transaction rollback.
@@ -73,9 +75,8 @@ async def db_session(setup_database) -> AsyncGenerator[AsyncSession, None]:
 pytest_asyncio.fixture(scope="session", autouse=True)
 
 
-async def event_loop():
+async def event_loop() -> AsyncGenerator[asyncio.AbstractEventLoop, None]:
     """Create an instance of the default event loop for the test session."""
-    import asyncio
 
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
