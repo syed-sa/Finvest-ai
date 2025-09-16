@@ -11,6 +11,7 @@ from src.api import routes
 from src.core.config import settings
 from src.db.session import add_postgresql_extension
 
+
 if settings.LOGGING_CONFIG_PATH.exists():
     with open(settings.LOGGING_CONFIG_PATH) as f:
         config = yaml.safe_load(f)
