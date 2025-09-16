@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock
 
+from fastapi import status
 from fastapi.testclient import TestClient
 
 from src.main import app
-
 
 client = TestClient(app)
 
@@ -15,5 +15,5 @@ def test_health(monkeypatch: MagicMock) -> None:
     monkeypatch.setenv("POSTGRES_HOST", "localhost")
 
     response = client.get("/v1/ping")
-    assert response.status_code == 200
-    assert response.json() == {"ping": "pong!"}
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {"status": "ok"}

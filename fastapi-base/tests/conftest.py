@@ -2,13 +2,14 @@ import asyncio
 from typing import AsyncGenerator, Callable
 
 import pytest_asyncio
+from fastapi_cache import FastAPICache  # type: ignore
+from fastapi_cache.backends.inmemory import InMemoryBackend  # type: ignore
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 
 from src.core.config import settings
-
 
 # Create test engine with NullPool to avoid connection conflicts
 async_test_engine = create_async_engine(
@@ -70,6 +71,14 @@ async def db_session(
         if transaction.is_active:
             await transaction.rollback()
         await connection.close()
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def setup_cache():
+    # Initialize FastAPICache with an in-memory backend before each test
+    FastAPICache.init(InMemoryBackend(), prefix="test-cache")
+    yield
+    await FastAPICache.clear()
 
 
 # Configure pytest-asyncio
