@@ -267,7 +267,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Args:
             obj_id: The ID of the object to soft delete
-            deleted_field: The name of the boolean field to set (default: 'is_deleted')
+            deleted_field: The name of the boolean field to set (default: 'deleted_at')
 
         Returns:
             The soft-deleted object
