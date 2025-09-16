@@ -21,7 +21,7 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 ## 📚 Documentation
 
 - [Architecture](docs/architecture.md) - System architecture overview
-- [Development](docs/developing.md) - CIEX local development guide
+- [Development](docs/developing.md) - local development guide
 
 ## 🚀 Quick Start
 

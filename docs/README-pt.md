@@ -21,7 +21,7 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 ## 📚 Documentação
 
 - [Arquitetura](docs/architecture.md) - Visão geral da arquitetura do sistema
-- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local CIEX
+- [Desenvolvimento](docs/developing.md) - Guia de desenvolvimento local
 
 ## 🚀 Início Rápido
 
