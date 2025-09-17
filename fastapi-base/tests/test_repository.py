@@ -184,7 +184,7 @@ async def test_exists(db_session):
     base_repo = BaseTestRepository(db_session)
 
     user_data = BaseTestCreate(name="Existence Check", email="existence@example.com")
-    created_user = await base_repo.create(user_data)
+    _ = await base_repo.create(user_data)
     exists = await base_repo.exists(email="existence@example.com")
     not_exists = await base_repo.exists(email="nonexistent@example.com")
 
