@@ -12,6 +12,7 @@ from sqlmodel import SQLModel, select
 from src.core.exceptions import ObjectNotFound, RepositoryError
 from src.interfaces.repository import IRepository
 
+
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=SQLModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=SQLModel)
