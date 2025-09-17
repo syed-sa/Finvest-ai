@@ -125,7 +125,7 @@ If Docker builds fail due to network restrictions:
    ```bash
    # With Docker (if available):
    make alembic-make-migrations "description of change"
-   
+
    # Alternative: modify Alembic directly
    # Note: Requires running PostgreSQL instance
    ```
@@ -197,7 +197,7 @@ If Docker builds fail due to network restrictions:
   ```bash
   # If pre-commit works in your environment:
   uvx pre-commit run --all-files
-  
+
   # Otherwise, run manually:
   uv run ruff check src/
   uv run black --check .
@@ -290,7 +290,7 @@ If Docker builds fail due to network restrictions:
 - May fail in sandboxed/restricted network environments
 - Alternative: Run linting tools manually before committing
 
-### Docker in Restricted Environments  
+### Docker in Restricted Environments
 - TLS certificate validation may fail
 - Alternative: Use native development with `uv`
 
