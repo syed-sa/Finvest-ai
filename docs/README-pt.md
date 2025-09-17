@@ -29,6 +29,7 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 - [Arquitetura](architecture.md) - Visão geral da arquitetura do sistema
 - [Guia de Desenvolvimento](developing.md) - Diretrizes de desenvolvimento local
 - [Guia de Contribuição](../CONTRIBUTING.md) - Como contribuir para este projeto
+- [Resolução de Problemas](troubleshooting.md) - Problemas comuns e soluções
 
 ## ✨ Funcionalidades
 

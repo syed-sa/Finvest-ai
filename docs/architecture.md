@@ -18,6 +18,14 @@ The fastapi-base project follows a modern, microservices-oriented architecture w
                        └─────────────────┘    └─────────────────┘
 ```
 
+### High-Level Request Flow
+
+```
+User Request → Load Balancer → FastAPI App → Business Logic → Database
+                                    ↓
+                              Cache Check (Redis) → Background Tasks (Celery)
+```
+
 ## 🛠️ Technology Stack
 
 ### Core Framework

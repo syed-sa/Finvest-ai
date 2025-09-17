@@ -29,6 +29,7 @@ Ce projet a été créé en utilisant l'excellent template [cookiecutter-fastapi
 - [Architecture](architecture.md) - Aperçu de l'architecture système
 - [Guide de Développement](developing.md) - Directives de développement local
 - [Guide de Contribution](../CONTRIBUTING.md) - Comment contribuer à ce projet
+- [Dépannage](troubleshooting.md) - Problèmes courants et solutions
 
 ## ✨ Fonctionnalités
 

@@ -29,6 +29,7 @@ Este proyecto fue creado usando la excelente plantilla [cookiecutter-fastapi-bac
 - [Arquitectura](architecture.md) - Resumen de la arquitectura del sistema
 - [Guía de Desarrollo](developing.md) - Directrices de desarrollo local
 - [Guía de Contribución](../CONTRIBUTING.md) - Cómo contribuir a este proyecto
+- [Solución de Problemas](troubleshooting.md) - Problemas comunes y soluciones
 
 ## ✨ Características
 

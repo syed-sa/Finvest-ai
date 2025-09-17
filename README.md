@@ -29,6 +29,7 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 - [Architecture](docs/architecture.md) - System architecture overview
 - [Development Guide](docs/developing.md) - Local development guidelines
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute to this project
+- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
 
 ## ✨ Features
 

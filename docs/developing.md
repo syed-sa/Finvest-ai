@@ -603,4 +603,4 @@ async def get_user_profile(user_id: int) -> dict:
 3. **Use different secrets** for different environments
 4. **Rotate secrets regularly**
 
-This guide should help you get started with development on the fastapi-base project. For additional questions, please refer to the [Architecture Overview](architecture.md) or [Contributing Guidelines](../CONTRIBUTING.md).
+This guide should help you get started with development on the fastapi-base project. For additional questions, please refer to the [Architecture Overview](architecture.md), [Contributing Guidelines](../CONTRIBUTING.md), or [Troubleshooting Guide](troubleshooting.md) for common issues and solutions.
