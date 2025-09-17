@@ -253,49 +253,6 @@ docker compose exec fastapi-base pytest tests/test_specific.py
 uv run pytest tests/test_specific.py
 ```
 
-## 🚀 Production Deployment
-
-The project includes production-ready Docker configurations:
-
-### Using Production Dockerfile
-```bash
-# Build production image
-docker build -f ops/production.Dockerfile -t fastapi-base:prod .
-
-# Run production container
-docker run -p 8000:8000 --env-file .env fastapi-base:prod
-```
-
-### Environment-specific Considerations
-- Set `DEBUG=False` in production
-- Use proper `SECRET_KEY`
-- Configure `SENTRY_DSN` for error tracking
-- Set up proper database credentials
-- Use Redis for session management and caching
-
-## 🏗️ Project Structure
-
-```
-fastapi-base/
-├── fastapi-base/              # Main application directory
-│   ├── src/                   # Source code
-│   │   ├── core/              # Core configuration and settings
-│   │   ├── models/            # Database models
-│   │   ├── api/               # API routes and endpoints
-│   │   ├── db/                # Database utilities
-│   │   ├── migrations/        # Alembic database migrations
-│   │   └── main.py            # Application entry point
-│   ├── tests/                 # Test suite
-│   ├── pyproject.toml         # Python dependencies and tool config
-│   └── Dockerfile             # Development Docker image
-├── ops/                       # Operations and deployment
-│   └── production.Dockerfile  # Production Docker image
-├── docs/                      # Documentation
-├── docker-compose.yml         # Development environment setup
-├── Makefile                   # Development commands
-└── .env.example              # Environment variables template
-```
-
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for detailed information about:
