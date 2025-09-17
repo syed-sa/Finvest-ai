@@ -147,11 +147,6 @@ fastapi-base/
 
 ## 🔐 Security Architecture
 
-### Authentication & Authorization
-- **JWT Tokens**: Stateless authentication using JSON Web Tokens
-- **Password Hashing**: Secure password storage using bcrypt
-- **CORS Configuration**: Cross-Origin Resource Sharing configuration for frontend integration
-
 ### Database Security
 - **Connection Encryption**: SSL/TLS encryption for database connections
 - **Parameter Binding**: Parameterized queries to prevent SQL injection

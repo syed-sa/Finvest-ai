@@ -64,7 +64,7 @@ ENV=dev
 
 **Docker Compose services running:**
 - [ ] fastapi-base
-- [ ] db (PostgreSQL)  
+- [ ] db (PostgreSQL)
 - [ ] redis
 - [ ] celery
 - [ ] beat

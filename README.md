@@ -232,7 +232,7 @@ make hooks
 
 This will install hooks that run automatically before each commit to:
 - Format code with `black`
-- Sort imports with `isort`  
+- Sort imports with `isort`
 - Lint code with `ruff`
 - Check types with `mypy`
 - Run tests
@@ -268,7 +268,7 @@ docker run -p 8000:8000 --env-file .env fastapi-base:prod
 
 ### Environment-specific Considerations
 - Set `DEBUG=False` in production
-- Use proper `SECRET_KEY` 
+- Use proper `SECRET_KEY`
 - Configure `SENTRY_DSN` for error tracking
 - Set up proper database credentials
 - Use Redis for session management and caching

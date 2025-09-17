@@ -18,9 +18,9 @@ Brief description of what this PR does.
 Fixes #(issue number)
 
 ## Changes Made
-- 
-- 
-- 
+-
+-
+-
 
 ## Testing
 - [ ] Unit tests pass (`make test`)

@@ -151,25 +151,23 @@ When creating new models, follow these guidelines:
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime
+from .base import BaseModel
 
-class UserBase(SQLModel):
-    email: str = Field(unique=True, index=True)
+class UserBase(BaseModel):
+    email: str
     full_name: Optional[str] = None
     is_active: bool = Field(default=True)
 
 class User(UserBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
 
 class UserCreate(UserBase):
     password: str
 
 class UserRead(UserBase):
-    id: int
-    created_at: datetime
-    updated_at: Optional[datetime]
+    # All fields from BaseModel (id, created_at, updated_at, deleted_at)
+    # + email, full_name, is_active from UserBase
+    pass
 ```
 
 ### Database Best Practices
@@ -217,97 +215,6 @@ tests/
     └── test_helpers.py
 ```
 
-### Writing Tests
-
-Follow these patterns when writing tests:
-
-```python
-# Example API test
-import pytest
-from fastapi.testclient import TestClient
-from sqlmodel import Session
-
-def test_create_user(client: TestClient, db_session: Session):
-    """Test user creation endpoint."""
-    user_data = {
-        "email": "test@example.com",
-        "password": "testpassword",
-        "full_name": "Test User"
-    }
-    
-    response = client.post("/api/v1/users/", json=user_data)
-    
-    assert response.status_code == 201
-    data = response.json()
-    assert data["email"] == user_data["email"]
-    assert "id" in data
-    assert "password" not in data  # Ensure password is not returned
-
-def test_create_user_duplicate_email(client: TestClient, db_session: Session):
-    """Test user creation with duplicate email fails."""
-    user_data = {"email": "test@example.com", "password": "testpassword"}
-    
-    # Create first user
-    client.post("/api/v1/users/", json=user_data)
-    
-    # Attempt to create duplicate
-    response = client.post("/api/v1/users/", json=user_data)
-    
-    assert response.status_code == 400
-    assert "already registered" in response.json()["detail"]
-```
-
-### Test Fixtures
-
-Use fixtures for common test setup in `conftest.py`:
-
-```python
-import pytest
-from fastapi.testclient import TestClient
-from sqlmodel import Session, create_engine
-from sqlmodel.pool import StaticPool
-
-from src.main import app
-from src.db.session import get_session
-from src.models import User
-
-@pytest.fixture
-def db_session():
-    """Create a test database session."""
-    engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
-    SQLModel.metadata.create_all(engine)
-    
-    with Session(engine) as session:
-        yield session
-
-@pytest.fixture
-def client(db_session: Session):
-    """Create a test client with database session override."""
-    def get_session_override():
-        return db_session
-
-    app.dependency_overrides[get_session] = get_session_override
-    yield TestClient(app)
-    app.dependency_overrides.clear()
-
-@pytest.fixture
-def sample_user(db_session: Session):
-    """Create a sample user for testing."""
-    user = User(
-        email="test@example.com",
-        hashed_password="hashedpassword",
-        full_name="Test User"
-    )
-    db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
-    return user
-```
-
 ## 🔧 Code Quality
 
 ### Pre-commit Hooks
@@ -326,25 +233,6 @@ pre-commit run black
 pre-commit run ruff
 ```
 
-### Linting and Formatting
-
-```bash
-# Format code with Black
-make black
-
-# Sort imports
-make isort
-
-# Lint with Ruff
-make lint
-
-# Type checking with mypy
-make mypy
-
-# Run all quality checks
-make precommit-run
-```
-
 ### Code Style Guidelines
 
 1. **Follow PEP 8** style guidelines
@@ -361,15 +249,15 @@ from typing import Optional, List
 from sqlmodel import Session, select
 
 async def get_user_by_email(
-    db: Session, 
+    db: Session,
     email: str
 ) -> Optional[User]:
     """Retrieve a user by their email address.
-    
+
     Args:
         db: Database session
         email: User's email address
-        
+
     Returns:
         User object if found, None otherwise
     """
@@ -378,17 +266,17 @@ async def get_user_by_email(
     return result.first()
 
 async def get_active_users(
-    db: Session, 
-    skip: int = 0, 
+    db: Session,
+    skip: int = 0,
     limit: int = 100
 ) -> List[User]:
     """Retrieve a list of active users with pagination.
-    
+
     Args:
         db: Database session
         skip: Number of records to skip
         limit: Maximum number of records to return
-        
+
     Returns:
         List of active users
     """
@@ -462,14 +350,14 @@ async def create_user(
 ):
     """Create a new user."""
     user_service = UserService(db)
-    
+
     # Check if user already exists
     if user_service.get_by_email(user_in.email):
         raise HTTPException(
             status_code=400,
             detail="User with this email already exists"
         )
-    
+
     user = user_service.create(user_in)
     return user
 

@@ -14,7 +14,7 @@ This guide helps you resolve common issues when developing with or deploying the
    ```bash
    # Check if port 8666 is already used
    lsof -i :8666
-   # Check if port 5431 is already used  
+   # Check if port 5431 is already used
    lsof -i :5431
    ```
 
@@ -102,7 +102,7 @@ This guide helps you resolve common issues when developing with or deploying the
    ```bash
    # Check current migration version
    docker compose exec fastapi-base alembic current
-   
+
    # Check migration history
    docker compose exec fastapi-base alembic history
    ```
@@ -234,7 +234,7 @@ This guide helps you resolve common issues when developing with or deploying the
    ```bash
    # Using uv
    uvx install pre-commit
-   
+
    # Or using pip
    pip install pre-commit
    ```
@@ -342,7 +342,7 @@ This guide helps you resolve common issues when developing with or deploying the
    ```bash
    # Development
    docker compose logs -f fastapi-base
-   
+
    # Production
    docker logs -f <container-id>
    ```
@@ -351,7 +351,7 @@ This guide helps you resolve common issues when developing with or deploying the
    ```bash
    # Search for specific errors
    docker compose logs fastapi-base | grep ERROR
-   
+
    # Search for API calls
    docker compose logs fastapi-base | grep "GET /api"
    ```

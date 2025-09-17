@@ -75,7 +75,7 @@
 The project includes a comprehensive Makefile with useful commands:
 
 - `make up` - Start all services
-- `make down` - Stop all services  
+- `make down` - Stop all services
 - `make build` - Build and start services
 - `make test` - Run test suite
 - `make lint` - Run linting checks
@@ -100,7 +100,7 @@ The project uses automated code formatting tools:
 
 ```bash
 make black    # Format code with Black
-make isort    # Sort imports  
+make isort    # Sort imports
 make lint     # Run ruff linting
 make mypy     # Type checking
 ```
@@ -119,7 +119,7 @@ def example_function(param1: str, param2: int) -> bool:
 
     Returns:
         Description of return value.
-        
+
     Raises:
         ValueError: When param2 is negative.
     """
@@ -143,7 +143,7 @@ def example_function(param1: str, param2: int) -> bool:
 tests/
 ├── conftest.py              # Pytest configuration and fixtures
 ├── test_api/               # API endpoint tests
-├── test_models/            # Database model tests  
+├── test_models/            # Database model tests
 ├── test_core/              # Core functionality tests
 └── test_utils/             # Utility function tests
 ```
@@ -169,7 +169,7 @@ Follow these guidelines when writing tests:
    ```python
    def test_login_success():
        # Test successful login
-       
+
    def test_login_invalid_credentials():
        # Test login with wrong credentials
    ```
@@ -238,7 +238,7 @@ type(scope): description
 
 **Types:**
 - `feat:` - New feature
-- `fix:` - Bug fix  
+- `fix:` - Bug fix
 - `docs:` - Documentation changes
 - `style:` - Code style changes (formatting, etc.)
 - `refactor:` - Code refactoring
