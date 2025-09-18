@@ -13,7 +13,7 @@ async def test_get_redis_client():
     # Optionally test ping
     pong = await redis_client.ping()
     assert pong is True
-    await redis_client.close()
+    await redis_client.aclose()
 
 
 @pytest.mark.asyncio

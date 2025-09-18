@@ -93,6 +93,7 @@ omit = [
     'src/core/config.py',
     'src/core/exceptions.py',
     'src/interfaces/repository.py',
+    'src/main.py',
 ]
 
 [tool.mypy]

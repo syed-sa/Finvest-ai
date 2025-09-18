@@ -77,7 +77,7 @@ class TestIResponseBase:
         user = User(id=1, name="John", email="john@example.com")
         response = IResponseBase[User](message="Success", data=user, meta={"count": 1})
 
-        json_data = response.dict()
+        json_data = response.model_dump()
         expected = {
             "message": "Success",
             "meta": {"count": 1},

@@ -23,7 +23,6 @@ async def test_session_local():
         assert hasattr(session, "close")
 
 
-@pytest.mark.asyncio
 def test_get_session():
     """Test the get_session dependency"""
     gen = get_session()
