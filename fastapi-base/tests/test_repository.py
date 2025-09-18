@@ -17,7 +17,7 @@ class BaseTest(BaseModel, table=True):
     is_active: bool = Field(default=True)
 
 
-# For creating users (input validation)
+# For test instances
 class BaseTestCreate(SQLModel):
     email: str = Field(max_length=255)
     name: str = Field(max_length=100)
