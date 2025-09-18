@@ -1,7 +1,7 @@
-import uuid
 from typing import Optional
 
 import pytest
+import uuid_utils as uuid_ext_pkg
 from sqlmodel import Field, SQLModel
 
 from src.core.exceptions import ObjectNotFound
@@ -76,7 +76,7 @@ async def test_get_not_found(db_session):
     base_repo = BaseTestRepository(db_session)
 
     with pytest.raises(ObjectNotFound):
-        await base_repo.get(id=uuid.uuid4())  # Assuming this ID does not exist
+        await base_repo.get(id=uuid_ext_pkg.uuid7())  # Assuming this ID does not exist
 
 
 # @pytest.mark.asyncio
