@@ -92,7 +92,7 @@ omit = [
     'src/core/backends.py',
     'src/core/config.py',
     'src/core/exceptions.py',
-    'src/interfaces/repository.py',
+    'src/interfaces/*',
     'src/main.py',
 ]
 
