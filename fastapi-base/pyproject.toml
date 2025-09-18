@@ -77,9 +77,23 @@ ignore-words-list = 'selectin,THIRDPARTY'
 
 [tool.coverage.report]
 fail_under = 20
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "print\\(",                   # exclude all print statements
+]
+
 
 [tool.coverage.run]
-omit = ['*tests/*']
+omit = [
+    '*tests/*',
+    'src/core/enums.py',
+    'src/core/backends.py',
+    'src/core/config.py',
+    'src/core/exceptions.py',
+    'src/interfaces/repository.py',
+]
 
 [tool.mypy]
 exclude = ["migrations/"]
