@@ -14,13 +14,12 @@ from src.core.backends import RedisBackend
 from src.core.config import settings
 from src.db.session import add_postgresql_extension
 
-
 if settings.LOGGING_CONFIG_PATH.exists():
     with open(settings.LOGGING_CONFIG_PATH) as f:
         config = yaml.safe_load(f)
     logging.config.dictConfig(config)
 else:
-    print("Warning: logconfig.yml not found")
+    print("Warning: logconfig.yml not found")  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +40,7 @@ app = FastAPI(
 )
 
 
+# pragma: no cover start
 async def on_startup() -> None:
     await add_postgresql_extension()
     redis_client = await get_redis_client()
@@ -64,6 +64,9 @@ async def on_startup() -> None:
             profile_lifecycle="trace",
         )
     logger.info("FastAPI app running...")
+
+
+# pragma: no cover stop
 
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
