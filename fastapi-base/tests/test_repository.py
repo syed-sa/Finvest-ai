@@ -1,7 +1,7 @@
-import uuid
 from typing import Optional
 
 import pytest
+import uuid_utils as uuid_ext_pkg
 from sqlmodel import Field, SQLModel
 
 from src.core.exceptions import ObjectNotFound, RepositoryError
@@ -90,26 +90,42 @@ async def test_get_not_found(db_session):
     base_repo = BaseTestRepository(db_session)
 
     with pytest.raises(ObjectNotFound):
-        await base_repo.get(id=uuid.uuid4())  # Assuming this ID does not exist
+        await base_repo.get(id=uuid_ext_pkg.uuid7())  # Assuming this ID does not exist
+        # Spoiler: it doesn’t exist (unless my cat ran the tests)
 
 
-# @pytest.mark.asyncio
-# @pytest.skip(
-#     reason="This needs to be more thoroughly tested with actual relationships and better implementation"
-# )
-# async def test_get_with_relations(db_session):
-#     """Test getting a user with relations (even though there are none in this simple model)"""
-#     base_repo = BaseTestRepository(db_session)
+@pytest.mark.asyncio
+async def test_get_with_relations(db_session):
+    """Test getting a user with relations (even though there are none in this simple model)"""
+    base_repo = BaseTestRepository(db_session)
+    user_data = BaseTestCreate(name="Relational User", email="relational@example.com")
+    created_user = await base_repo.create(user_data)
 
-#     user_data = BaseTestCreate(name="Relational User", email="relational@example.com")
+    # Fix: Pass an empty list for relations as the first parameter, then the ID as a keyword argument
+    found_user = await base_repo.get_with_relations(relations=[], id=created_user.id)
 
-#     created_user = await base_repo.create(user_data)
+    assert found_user.id == created_user.id
+    assert found_user.name == "Relational User"
+    assert found_user.email == "relational@example.com"
 
-#     found_user = await base_repo.get_with_relations(created_user.id)
 
-#     assert found_user.id == created_user.id
-#     assert found_user.name == "Relational User"
-#     assert found_user.email == "relational@example.com"
+@pytest.mark.asyncio
+async def test_get_inexistent_relations(db_session):
+    """Test getting a user with non-existent relations (should be silently ignored)"""
+    base_repo = BaseTestRepository(db_session)
+    user_data = BaseTestCreate(name="No Relations User", email="no_relations@example.com")
+    created_user = await base_repo.create(user_data)
+
+    # Non-existent relations should be silently ignored
+    found_user = await base_repo.get_with_relations(
+        relations=["non_existent_relation"], id=created_user.id
+    )
+
+    # Should still return the user, just without the non-existent relation loaded
+    assert found_user is not None
+    assert found_user.id == created_user.id
+    assert found_user.name == "No Relations User"
+    assert found_user.email == "no_relations@example.com"
 
 
 @pytest.mark.asyncio
