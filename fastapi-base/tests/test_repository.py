@@ -95,6 +95,16 @@ async def test_get_not_found(db_session):
 
 
 @pytest.mark.asyncio
+async def test_get_sqlalchemy_error(db_session):
+    """Test getting an instance with invalid criteria to trigger SQLAlchemy error"""
+    base_repo = BaseTestRepository(db_session)
+
+    with pytest.raises(RepositoryError):
+        # Intentionally passing an invalid filter to trigger an error
+        await base_repo.get(invalid_field="some_value")  # type: ignore
+
+
+@pytest.mark.asyncio
 async def test_get_with_relations(db_session):
     """Test getting a user with relations (even though there are none in this simple model)"""
     base_repo = BaseTestRepository(db_session)
@@ -142,6 +152,17 @@ async def test_update_by_id(db_session):
 
 
 @pytest.mark.asyncio
+async def test_update_not_found(db_session):
+    """Test updating a non-existent user by ID"""
+    base_repo = BaseTestRepository(db_session)
+
+    update_data = BaseTestUpdate(name="Should Not Exist")
+
+    with pytest.raises(ObjectNotFound):
+        await base_repo.update_by_id(uuid_ext_pkg.uuid7(), update_data)  # Non-existent ID
+
+
+@pytest.mark.asyncio
 async def test_get_user(db_session):
     """Test getting a user by criteria"""
     base_repo = BaseTestRepository(db_session)
@@ -183,6 +204,15 @@ async def test_delete_by_id(db_session):
 
 
 @pytest.mark.asyncio
+async def test_delete_by_id_sqlalchemy_error(db_session):
+    """Test deleting a user by ID with invalid ID to trigger SQLAlchemy error"""
+    base_repo = BaseTestRepository(db_session)
+
+    with pytest.raises(RepositoryError):
+        await base_repo.delete_by_id("invalid-uuid")  # type: ignore
+
+
+@pytest.mark.asyncio
 async def test_soft_delete_by_id(db_session):
     """Test soft deleting a user by ID"""
     base_repo = BaseTestRepository(db_session)
@@ -192,6 +222,15 @@ async def test_soft_delete_by_id(db_session):
     await base_repo.soft_delete(created_user.id)
     soft_deleted_user = await base_repo.get(id=created_user.id)
     assert soft_deleted_user.deleted_at is not None
+
+
+@pytest.mark.asyncio
+async def test_soft_delete_by_id_not_found(db_session):
+    """Test soft deleting a non-existent user by ID"""
+    base_repo = BaseTestRepository(db_session)
+
+    with pytest.raises(ObjectNotFound):
+        await base_repo.soft_delete(uuid_ext_pkg.uuid7())  # Non-existent ID
 
 
 @pytest.mark.asyncio
