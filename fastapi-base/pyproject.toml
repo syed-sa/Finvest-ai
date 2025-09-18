@@ -76,7 +76,7 @@ lint.ignore = [
 ignore-words-list = 'selectin,THIRDPARTY'
 
 [tool.coverage.report]
-fail_under = 20
+fail_under = 70
 exclude_lines = [
     "pragma: no cover",
     "if __name__ == .__main__.:",

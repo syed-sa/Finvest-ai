@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 import pytest
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from src.schemas.common import IGetResponseBase, IPostResponseBase, IResponseBase
 
@@ -204,7 +204,7 @@ class TestResponseModelsValidation:
 
     def test_invalid_data_type(self):
         """Test that wrong data type raises validation error"""
-        with pytest.raises(Exception):  # Pydantic validation error
+        with pytest.raises(ValidationError):  # Pydantic validation error
             IResponseBase[int](
                 message="Test",
                 data="not an integer",  # Wrong type
@@ -212,7 +212,7 @@ class TestResponseModelsValidation:
 
     def test_meta_must_be_dict(self):
         """Test that meta must be a dictionary"""
-        with pytest.raises(Exception):  # Pydantic validation error
+        with pytest.raises(ValidationError):  # Pydantic validation error
             IResponseBase[str](
                 message="Test",
                 meta="not a dict",  # Wrong type
@@ -220,7 +220,7 @@ class TestResponseModelsValidation:
 
     def test_message_must_be_string(self):
         """Test that message must be a string"""
-        with pytest.raises(Exception):  # Pydantic validation error
+        with pytest.raises(ValidationError):  # Pydantic validation error
             IResponseBase[str](
                 message=123,  # Wrong type
                 data="test",

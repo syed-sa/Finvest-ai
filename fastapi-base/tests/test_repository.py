@@ -4,7 +4,7 @@ from typing import Optional
 import pytest
 from sqlmodel import Field, SQLModel
 
-from src.core.exceptions import ObjectNotFound
+from src.core.exceptions import ObjectNotFound, RepositoryError
 from src.models.base import BaseModel
 from src.repositories.sqlalchemy import BaseSQLAlchemyRepository
 
@@ -68,6 +68,20 @@ async def test_create_many(db_session):
         assert user.id is not None
         assert user.name == f"User {i}"
         assert user.email == f"user{i}@example.com"
+
+
+@pytest.mark.asyncio
+async def test_create_many_error(db_session):
+    """Test create_many method with duplicate emails to trigger error"""
+    base_repo = BaseTestRepository(db_session)
+
+    users_data = [
+        BaseTestCreate(name="User 1", email="user1@example.com"),
+        BaseTestCreate(name="User 2", email="user1@example.com"),
+    ]
+
+    with pytest.raises(RepositoryError):
+        await base_repo.create_many(users_data)
 
 
 @pytest.mark.asyncio

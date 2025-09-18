@@ -3,6 +3,7 @@ import logging
 
 from src.db.session import AsyncSessionLocal as SessionLocal
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
