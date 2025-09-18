@@ -77,6 +77,7 @@ async def test_get_not_found(db_session):
 
     with pytest.raises(ObjectNotFound):
         await base_repo.get(id=uuid_ext_pkg.uuid7())  # Assuming this ID does not exist
+        # Spoiler: it doesn’t exist (unless my cat ran the tests)
 
 
 # @pytest.mark.asyncio
