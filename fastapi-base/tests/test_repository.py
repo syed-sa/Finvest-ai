@@ -80,23 +80,19 @@ async def test_get_not_found(db_session):
         # Spoiler: it doesn’t exist (unless my cat ran the tests)
 
 
-# @pytest.mark.asyncio
-# @pytest.skip(
-#     reason="This needs to be more thoroughly tested with actual relationships and better implementation"
-# )
-# async def test_get_with_relations(db_session):
-#     """Test getting a user with relations (even though there are none in this simple model)"""
-#     base_repo = BaseTestRepository(db_session)
+@pytest.mark.asyncio
+async def test_get_with_relations(db_session):
+    """Test getting a user with relations (even though there are none in this simple model)"""
+    base_repo = BaseTestRepository(db_session)
+    user_data = BaseTestCreate(name="Relational User", email="relational@example.com")
+    created_user = await base_repo.create(user_data)
 
-#     user_data = BaseTestCreate(name="Relational User", email="relational@example.com")
+    # Fix: Pass an empty list for relations as the first parameter, then the ID as a keyword argument
+    found_user = await base_repo.get_with_relations(relations=[], id=created_user.id)
 
-#     created_user = await base_repo.create(user_data)
-
-#     found_user = await base_repo.get_with_relations(created_user.id)
-
-#     assert found_user.id == created_user.id
-#     assert found_user.name == "Relational User"
-#     assert found_user.email == "relational@example.com"
+    assert found_user.id == created_user.id
+    assert found_user.name == "Relational User"
+    assert found_user.email == "relational@example.com"
 
 
 @pytest.mark.asyncio

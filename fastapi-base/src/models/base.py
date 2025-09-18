@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -20,7 +21,7 @@ def pg_utcnow(element, compiler, **kw) -> str:  # type: ignore
 
 # this is the base model, as a best practice, other db models should inherit it
 class BaseModel(SQLModel):
-    id: Optional[uuid_ext_pkg.UUID] = Field(
+    id: Optional[uuid.UUID] = Field(
         default_factory=uuid_ext_pkg.uuid7,
         primary_key=True,
         index=True,
