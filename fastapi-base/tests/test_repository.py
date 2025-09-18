@@ -96,6 +96,25 @@ async def test_get_with_relations(db_session):
 
 
 @pytest.mark.asyncio
+async def test_get_inexistent_relations(db_session):
+    """Test getting a user with non-existent relations (should be silently ignored)"""
+    base_repo = BaseTestRepository(db_session)
+    user_data = BaseTestCreate(name="No Relations User", email="no_relations@example.com")
+    created_user = await base_repo.create(user_data)
+
+    # Non-existent relations should be silently ignored
+    found_user = await base_repo.get_with_relations(
+        relations=["non_existent_relation"], id=created_user.id
+    )
+
+    # Should still return the user, just without the non-existent relation loaded
+    assert found_user is not None
+    assert found_user.id == created_user.id
+    assert found_user.name == "No Relations User"
+    assert found_user.email == "no_relations@example.com"
+
+
+@pytest.mark.asyncio
 async def test_update_by_id(db_session):
     """Test updating a user by ID"""
     base_repo = BaseTestRepository(db_session)
