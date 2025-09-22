@@ -20,10 +20,17 @@ services:
       - POSTGRES_DB=test
       - POSTGRES_PORT=5432
       - POSTGRES_HOST=db-test
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
     volumes:
       - /data:/data # to access coverage.xml
     depends_on:
       - db-test
+      - redis-test
+  redis-test:
+    image: redis:7-alpine
+    expose:
+      - "6379"
   db-test:
     image: postgres:18rc1-alpine3.22
     expose:
