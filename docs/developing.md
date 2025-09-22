@@ -17,28 +17,33 @@ Before starting development, ensure you have the following installed:
 ### Initial Setup
 
 1. **Clone and enter the repository**:
+
    ```bash
    git clone https://github.com/GabrielVGS/fastapi-base.git
    cd fastapi-base
    ```
 
 2. **Copy environment configuration**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Install Python dependencies** (for local development):
+
    ```bash
    cd fastapi-base/
    uv sync
    ```
 
 4. **Install pre-commit hooks**:
+
    ```bash
    make hooks
    ```
 
 5. **Start the development environment**:
+
    ```bash
    make build
    ```
@@ -58,6 +63,7 @@ make up
 ```
 
 This will start:
+
 - **FastAPI application** on `http://localhost:8666`
 - **PostgreSQL database** on `localhost:5431`
 - **Redis** for caching and sessions
@@ -110,6 +116,7 @@ The project uses Alembic for database migrations:
 #### Initial Setup
 
 For a fresh database:
+
 ```bash
 make alembic-init      # Create initial migration
 make alembic-migrate   # Apply migrations
@@ -118,6 +125,7 @@ make alembic-migrate   # Apply migrations
 #### Creating New Migrations
 
 When you modify models:
+
 ```bash
 make alembic-make-migrations "describe your changes"
 make alembic-migrate
@@ -295,6 +303,7 @@ async def get_active_users(
 ### Feature Development
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feature/user-authentication
    ```
@@ -304,18 +313,21 @@ async def get_active_users(
 3. **Write tests** for new functionality
 
 4. **Run quality checks**:
+
    ```bash
    make precommit-run
    make test
    ```
 
 5. **Commit your changes**:
+
    ```bash
    git add .
    git commit -m "feat(auth): implement JWT authentication"
    ```
 
 6. **Push and create PR**:
+
    ```bash
    git push origin feature/user-authentication
    ```

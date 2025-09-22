@@ -7,24 +7,29 @@ Always reference these instructions first and fallback to search or bash command
 ## Working Effectively
 
 ### Prerequisites and Installation
+
 - Install `uv` package manager: `pip install uv`
 - Install `pre-commit`: `pip install pre-commit`
 - Ensure Docker and Docker Compose are available
 - Copy `.env.example` to `.env` and configure environment variables
 
 ### Bootstrap and Setup
+
 1. **Install dependencies** (takes 10-30 seconds):
+
    ```bash
    cd fastapi-base/
    uv sync
    ```
 
 2. **Set up pre-commit hooks**:
+
    ```bash
    uvx pre-commit install
    ```
 
 3. **Configure environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with appropriate database and Redis URLs
@@ -35,11 +40,13 @@ Always reference these instructions first and fallback to search or bash command
 **IMPORTANT**: Docker builds may fail in sandboxed environments due to TLS certificate issues. If you encounter `invalid peer certificate: UnknownIssuer` errors, this is a known limitation and the instructions will note alternative approaches.
 
 1. **Build and run with Docker Compose** (takes 2-5 minutes if successful):
+
    ```bash
    make build    # NEVER CANCEL: May take up to 5 minutes in normal environments
    ```
 
 2. **Start services**:
+
    ```bash
    make up       # Starts all services (FastAPI, PostgreSQL, Redis, Celery, Beat)
    ```
@@ -54,12 +61,14 @@ Always reference these instructions first and fallback to search or bash command
 If Docker builds fail due to network restrictions:
 
 1. **Install dependencies**:
+
    ```bash
    cd fastapi-base/
    uv sync
    ```
 
 2. **Run linting and formatting** (takes 5-10 seconds each):
+
    ```bash
    uv run ruff check src/        # Linting - very fast
    uv run black --check .        # Code formatting check
@@ -68,12 +77,14 @@ If Docker builds fail due to network restrictions:
    ```
 
 3. **Fix linting/formatting issues**:
+
    ```bash
    uv run black .                # Apply black formatting
    uv run isort .                # Fix import sorting
    ```
 
 4. **Run tests** (takes 5-10 seconds for unit tests):
+
    ```bash
    # Note: Full tests require running PostgreSQL and Redis
    POSTGRES_URL="postgresql+asyncpg://test:test@localhost:5432/test" REDIS_URL="redis://redis:6379" uv run pytest tests/ -v
@@ -84,6 +95,7 @@ If Docker builds fail due to network restrictions:
 ### Making Code Changes
 
 1. **Always start with code quality checks**:
+
    ```bash
    cd fastapi-base/
    uv run ruff check src/
@@ -98,12 +110,14 @@ If Docker builds fail due to network restrictions:
    - Pydantic schemas: `src/schemas/`
 
 3. **Apply formatting** after changes:
+
    ```bash
    uv run black .
    uv run isort .
    ```
 
 4. **Validate changes**:
+
    ```bash
    uv run ruff check src/
    uv run mypy src/
@@ -122,6 +136,7 @@ If Docker builds fail due to network restrictions:
 
 1. **Modify models** in `src/models/`
 2. **Generate migration**:
+
    ```bash
    # With Docker (if available):
    make alembic-make-migrations "description of change"
@@ -144,12 +159,14 @@ If Docker builds fail due to network restrictions:
 ### Available Make Commands
 
 **Docker-based commands** (may fail in sandboxed environments):
+
 - `make build`: Build and start all services
 - `make up`: Start existing services
 - `make down`: Stop all services
 - `make bash`: Connect to the FastAPI container
 
 **Database commands** (require running PostgreSQL):
+
 - `make alembic-init`: Initialize first migration
 - `make alembic-migrate`: Apply migrations
 - `make alembic-make-migrations`: Create new migration
@@ -157,6 +174,7 @@ If Docker builds fail due to network restrictions:
 - `make init-db`: Initialize database with sample data
 
 **Code quality commands** (require running Docker container):
+
 - `make lint`: Run ruff linting
 - `make black`: Apply black formatting
 - `make isort`: Apply import sorting
@@ -169,9 +187,11 @@ If Docker builds fail due to network restrictions:
 ## Validation
 
 ### Manual Testing Steps
+
 - **Always run through this complete validation after making changes**:
 
 1. **Code Quality Checks** (NEVER CANCEL - each takes 5-20 seconds):
+
    ```bash
    uv run ruff check src/        # Should pass with no errors
    uv run black --check .        # Should show "would be left unchanged"
@@ -180,12 +200,14 @@ If Docker builds fail due to network restrictions:
    ```
 
 2. **Basic Functionality Test**:
+
    ```bash
    # Test that the FastAPI app can import successfully
    POSTGRES_URL="postgresql+asyncpg://test:test@localhost:5432/test" REDIS_URL="redis://redis:6379" uv run python -c "from src.main import app; print('FastAPI app imports successfully')"
    ```
 
 3. **Test Suite** (with mock database - takes 1-2 seconds):
+
    ```bash
    # The health endpoint test should pass without database
    POSTGRES_URL="postgresql+asyncpg://test:test@localhost:5432/test" REDIS_URL="redis://redis:6379" uv run pytest tests/test_routes.py::test_health -v
@@ -193,7 +215,9 @@ If Docker builds fail due to network restrictions:
    ```
 
 ### CI/CD Validation
+
 - **Always run before committing**:
+
   ```bash
   # If pre-commit works in your environment:
   uvx pre-commit run --all-files
@@ -207,21 +231,25 @@ If Docker builds fail due to network restrictions:
 ## Common Issues and Solutions
 
 ### Docker Build Failures
+
 - **Symptom**: `invalid peer certificate: UnknownIssuer` during Docker build
 - **Solution**: Use native development approach with `uv` instead of Docker
 - **Root Cause**: TLS certificate issues in sandboxed environments
 
 ### Database Connection Errors
+
 - **Symptom**: `OSError: Multiple exceptions: [Errno 111] Connect call failed`
 - **Solution**: Ensure PostgreSQL is running or use mock environment variables for testing
 - **For Testing**: Set `POSTGRES_URL="postgresql+asyncpg://test:test@localhost:5432/test"`
 
 ### Configuration Errors
+
 - **Symptom**: `ValidationError: POSTGRES_URL Value error, invalid literal for int()`
 - **Solution**: Ensure `.env` file has complete database URL or set environment variables
 - **Fix**: Set `POSTGRES_URL=postgresql+asyncpg://test:test@localhost:5432/test` in `.env`
 
 ### Cache Initialization Errors
+
 - **Symptom**: `AssertionError: You must call init first!` from FastAPI cache
 - **Solution**: The application requires Redis for full functionality
 - **For Testing**: Use Docker Compose or ensure Redis is running locally
@@ -242,6 +270,7 @@ If Docker builds fail due to network restrictions:
 ## Project Structure
 
 ### Key Directories
+
 - `src/`: Main application code
   - `api/`: API routes and dependencies
   - `core/`: Configuration and backend utilities
@@ -254,6 +283,7 @@ If Docker builds fail due to network restrictions:
 - `docs/`: Documentation (currently TODO)
 
 ### Key Files
+
 - `pyproject.toml`: Project dependencies and configuration
 - `docker-compose.yml`: Local development services
 - `Makefile`: Common development commands
@@ -263,6 +293,7 @@ If Docker builds fail due to network restrictions:
 ## Dependencies and Tools
 
 ### Core Dependencies
+
 - **FastAPI**: Web framework
 - **SQLAlchemy**: ORM
 - **Alembic**: Database migrations
@@ -271,6 +302,7 @@ If Docker builds fail due to network restrictions:
 - **PostgreSQL**: Database (asyncpg driver)
 
 ### Development Tools
+
 - **uv**: Package manager (faster than pip)
 - **ruff**: Linting (replaces flake8, isort partially)
 - **black**: Code formatting
@@ -282,15 +314,18 @@ If Docker builds fail due to network restrictions:
 ## Known Issues
 
 ### Type Checking
+
 - MyPy currently reports 16 errors in 6 files
 - These are mostly related to third-party library type annotations
 - The application runs successfully despite these type errors
 
 ### Pre-commit Hooks
+
 - May fail in sandboxed/restricted network environments
 - Alternative: Run linting tools manually before committing
 
 ### Docker in Restricted Environments
+
 - TLS certificate validation may fail
 - Alternative: Use native development with `uv`
 
