@@ -55,17 +55,20 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 ### Running with Docker (Recommended)
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/GabrielVGS/fastapi-base.git
    cd fastapi-base
    ```
 
 2. **Copy environment variables**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Start the services**:
+
    ```bash
    make up
    ```
@@ -81,21 +84,25 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 ### Setting up Local Environment
 
 1. **Install uv** (if not already installed):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Navigate to the project directory**:
+
    ```bash
    cd fastapi-base/
    ```
 
 3. **Install dependencies**:
+
    ```bash
    uv sync
    ```
 
 4. **Install pre-commit hooks**:
+
    ```bash
    make hooks
    ```
@@ -103,16 +110,19 @@ This project was created using the excellent [cookiecutter-fastapi-backend](http
 ### Database Migrations
 
 Initialize the first migration (project must be running with `docker compose up` and contain no 'version' files):
+
 ```bash
 make alembic-init
 ```
 
 Create new migration file:
+
 ```bash
 make alembic-make-migrations "describe your changes"
 ```
 
 Apply migrations:
+
 ```bash
 make alembic-migrate
 ```
@@ -120,6 +130,7 @@ make alembic-migrate
 ### Migration Workflow
 
 After each migration, you can create new migrations and apply them with:
+
 ```bash
 make alembic-make-migrations "describe your changes"
 make alembic-migrate
@@ -130,6 +141,7 @@ make alembic-migrate
 Create a `.env` file based on `.env.example`:
 
 ### Application Settings
+
 - `PROJECT_NAME` - Name of the project (default: fastapi-base)
 - `VERSION` - API version (default: v1)
 - `DEBUG` - Enable debug mode (default: True)
@@ -137,6 +149,7 @@ Create a `.env` file based on `.env.example`:
 - `ENV` - Environment (dev/staging/production)
 
 ### Database Configuration
+
 - `POSTGRES_USER` - PostgreSQL username
 - `POSTGRES_PASSWORD` - PostgreSQL password
 - `POSTGRES_DB` - Database name
@@ -145,11 +158,13 @@ Create a `.env` file based on `.env.example`:
 - `POSTGRES_URL` - Complete database URL (optional, auto-generated if not provided)
 
 ### Redis Configuration
+
 - `REDIS_HOST` - Redis host (default: redis)
 - `REDIS_PORT` - Redis port (default: 6379)
 - `REDIS_URL` - Complete Redis URL (optional, auto-generated if not provided)
 
 ### Optional Settings
+
 - `SENTRY_DSN` - Sentry error tracking DSN
 - `LOG_LEVEL` - Logging level (default: INFO)
 - `CACHE_TTL` - Cache time-to-live in seconds (default: 60)
@@ -219,6 +234,7 @@ make hooks          # Install pre-commit hooks
 By default, dependencies are managed with [uv](https://docs.astral.sh/uv/). Please visit the link and install it.
 
 From `./fastapi-base/` you can install all dependencies with:
+
 ```bash
 uv sync
 ```
@@ -226,11 +242,13 @@ uv sync
 ### Pre-commit Hooks
 
 The project uses pre-commit hooks to ensure code quality. Install them with:
+
 ```bash
 make hooks
 ```
 
 This will install hooks that run automatically before each commit to:
+
 - Format code with `black`
 - Sort imports with `isort`
 - Lint code with `ruff`
@@ -240,11 +258,13 @@ This will install hooks that run automatically before each commit to:
 ## 🧪 Testing
 
 Run the complete test suite:
+
 ```bash
 make test
 ```
 
 Run specific tests:
+
 ```bash
 # Inside the container
 docker compose exec fastapi-base pytest tests/test_specific.py

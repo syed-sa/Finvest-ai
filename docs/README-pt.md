@@ -55,17 +55,20 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 ### Executar com Docker (Recomendado)
 
 1. **Clonar o repositório**:
+
    ```bash
    git clone https://github.com/GabrielVGS/fastapi-base.git
    cd fastapi-base
    ```
 
 2. **Copiar variáveis de ambiente**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Iniciar os serviços**:
+
    ```bash
    make up
    ```
@@ -81,21 +84,25 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 ### Configuração do Ambiente Local
 
 1. **Instalar uv** (se não estiver já instalado):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Navegar para o diretório do projeto**:
+
    ```bash
    cd fastapi-base/
    ```
 
 3. **Instalar dependências**:
+
    ```bash
    uv sync
    ```
 
 4. **Instalar hooks pre-commit**:
+
    ```bash
    make hooks
    ```
@@ -103,16 +110,19 @@ Este projeto foi criado usando o excelente template [cookiecutter-fastapi-backen
 ### Migrações da Base de Dados
 
 Inicializar a primeira migração (o projeto deve estar a executar com `docker compose up` e não conter arquivos 'version'):
+
 ```bash
 make alembic-init
 ```
 
 Criar novo arquivo de migração:
+
 ```bash
 make alembic-make-migrations "descreva as suas alterações"
 ```
 
 Aplicar migrações:
+
 ```bash
 make alembic-migrate
 ```
@@ -120,6 +130,7 @@ make alembic-migrate
 ### Fluxo de Trabalho das Migrações
 
 Após cada migração, pode criar novas migrações e aplicá-las com:
+
 ```bash
 make alembic-make-migrations "descreva as suas alterações"
 make alembic-migrate
@@ -130,6 +141,7 @@ make alembic-migrate
 Crie um arquivo `.env` baseado no `.env.example`:
 
 ### Configurações da Aplicação
+
 - `PROJECT_NAME` - Nome do projeto (padrão: fastapi-base)
 - `VERSION` - Versão da API (padrão: v1)
 - `DEBUG` - Ativar modo debug (padrão: True)
@@ -137,6 +149,7 @@ Crie um arquivo `.env` baseado no `.env.example`:
 - `ENV` - Ambiente (dev/staging/production)
 
 ### Configuração da Base de Dados
+
 - `POSTGRES_USER` - Nome de utilizador PostgreSQL
 - `POSTGRES_PASSWORD` - Palavra-passe PostgreSQL
 - `POSTGRES_DB` - Nome da base de dados
@@ -145,11 +158,13 @@ Crie um arquivo `.env` baseado no `.env.example`:
 - `POSTGRES_URL` - URL completa da base de dados (opcional, auto-gerada se não fornecida)
 
 ### Configuração Redis
+
 - `REDIS_HOST` - Host Redis (padrão: redis)
 - `REDIS_PORT` - Porta Redis (padrão: 6379)
 - `REDIS_URL` - URL completa Redis (opcional, auto-gerada se não fornecida)
 
 ### Configurações Opcionais
+
 - `SENTRY_DSN` - DSN de rastreamento de erros Sentry
 - `LOG_LEVEL` - Nível de logging (padrão: INFO)
 - `CACHE_TTL` - Tempo de vida do cache em segundos (padrão: 60)
@@ -219,6 +234,7 @@ make hooks          # Instalar hooks pre-commit
 Por padrão, as dependências são geridas com [uv](https://docs.astral.sh/uv/). Por favor visite o link e instale-o.
 
 A partir de `./fastapi-base/` pode instalar todas as dependências com:
+
 ```bash
 uv sync
 ```
@@ -226,11 +242,13 @@ uv sync
 ### Hooks Pre-commit
 
 O projeto usa hooks pre-commit para assegurar a qualidade do código. Instale-os com:
+
 ```bash
 make hooks
 ```
 
 Isto instalará hooks que executam automaticamente antes de cada commit para:
+
 - Formatar código com `black`
 - Ordenar imports com `isort`
 - Analisar código com `ruff`
@@ -240,11 +258,13 @@ Isto instalará hooks que executam automaticamente antes de cada commit para:
 ## 🧪 Testes
 
 Executar a suite completa de testes:
+
 ```bash
 make test
 ```
 
 Executar testes específicos:
+
 ```bash
 # Dentro do contentor
 docker compose exec fastapi-base pytest tests/test_specific.py
@@ -258,6 +278,7 @@ uv run pytest tests/test_specific.py
 O projeto inclui configurações Docker prontas para produção:
 
 ### Usando Dockerfile de Produção
+
 ```bash
 # Construir imagem de produção
 docker build -f ops/production.Dockerfile -t fastapi-base:prod .
@@ -267,6 +288,7 @@ docker run -p 8000:8000 --env-file .env fastapi-base:prod
 ```
 
 ### Considerações Específicas do Ambiente
+
 - Definir `DEBUG=False` em produção
 - Usar `SECRET_KEY` apropriada
 - Configurar `SENTRY_DSN` para rastreamento de erros
