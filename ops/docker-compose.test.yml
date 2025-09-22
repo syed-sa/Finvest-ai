@@ -6,9 +6,9 @@ services:
       args:
         env: "test"
     command: |
-        bash -c "
-        while !</dev/tcp/db-test/5432; do sleep 1; done;
-        gunicorn src.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --log-level=debug --timeout=60"
+      bash -c "
+      while !</dev/tcp/db-test/5432; do sleep 1; done;
+      gunicorn src.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --log-level=debug --timeout=60"
     environment:
       - PYTHONUNBUFFERED=0
       - PROJECT_NAME=test
@@ -21,7 +21,7 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_HOST=db-test
     volumes:
-      - /data:/data  # to access coverage.xml
+      - /data:/data # to access coverage.xml
     depends_on:
       - db-test
   db-test:

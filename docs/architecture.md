@@ -29,25 +29,30 @@ User Request → Load Balancer → FastAPI App → Business Logic → Database
 ## 🛠️ Technology Stack
 
 ### Core Framework
+
 - **FastAPI** - Modern, fast web framework for building APIs with Python
 - **Pydantic** - Data validation and settings management using Python type annotations
 - **SQLModel** - SQL databases in Python, designed for simplicity, compatibility, and robustness
 
 ### Database & Storage
+
 - **PostgreSQL** - Advanced open-source relational database
 - **Alembic** - Database migration tool for SQLAlchemy
 - **Redis** - In-memory data structure store for caching and sessions
 
 ### Background Processing
+
 - **Celery** - Distributed task queue for background job processing
 - **Celery Beat** - Scheduler for periodic tasks
 
 ### Development & Deployment
+
 - **Docker** - Containerization for consistent development and deployment
 - **uv** - Fast Python package manager and resolver
 - **Gunicorn + Uvicorn** - ASGI server for production deployment
 
 ### Code Quality & Testing
+
 - **pytest** - Testing framework with fixtures and plugins
 - **ruff** - Fast Python linter and code formatter
 - **black** - Code formatter for consistent style
@@ -148,11 +153,13 @@ fastapi-base/
 ## 🔐 Security Architecture
 
 ### Database Security
+
 - **Connection Encryption**: SSL/TLS encryption for database connections
 - **Parameter Binding**: Parameterized queries to prevent SQL injection
 - **Input Validation**: Pydantic schemas validate all input data
 
 ### Environment Configuration
+
 - **Secret Management**: Sensitive data stored in environment variables
 - **Configuration Validation**: Pydantic settings for configuration validation
 - **Environment Isolation**: Separate configurations for development, testing, and production
@@ -160,16 +167,19 @@ fastapi-base/
 ## 📊 Monitoring & Observability
 
 ### Logging
+
 - **Structured Logging**: JSON-formatted logs for better parsing
 - **Log Levels**: Configurable log levels for different environments
 - **Request Tracing**: Correlation IDs for request tracking
 
 ### Error Handling
+
 - **Sentry Integration**: Error tracking and performance monitoring
 - **Exception Handling**: Comprehensive exception handling with proper HTTP status codes
 - **Health Checks**: API endpoints for service health monitoring
 
 ### Performance
+
 - **Database Connection Pooling**: Efficient database connection management
 - **Redis Caching**: In-memory caching for frequently accessed data
 - **Async Operations**: Non-blocking I/O for better performance
@@ -177,17 +187,20 @@ fastapi-base/
 ## 🚀 Deployment Architecture
 
 ### Development Environment
+
 - **Docker Compose**: Multi-container development setup
 - **Hot Reloading**: Automatic code reloading for development
 - **Volume Mounting**: Source code mounted for real-time changes
 
 ### Production Environment
+
 - **Multi-stage Docker Build**: Optimized production Docker images
 - **Gunicorn + Uvicorn**: Production ASGI server configuration
 - **Environment Variables**: Configuration through environment variables
 - **Health Checks**: Container health monitoring
 
 ### Scalability Considerations
+
 - **Horizontal Scaling**: Stateless design allows for easy horizontal scaling
 - **Database Connection Pooling**: Efficient resource utilization
 - **Caching Strategy**: Redis caching reduces database load
@@ -196,27 +209,32 @@ fastapi-base/
 ## 🔧 Configuration Management
 
 ### Environment-based Configuration
+
 - **Development**: Debug mode enabled, verbose logging
 - **Testing**: Isolated test database, mocked external services
 - **Production**: Optimized for performance, error monitoring enabled
 
 ### Feature Flags
+
 - **Environment Variables**: Feature toggles through environment configuration
 - **Runtime Configuration**: Dynamic configuration changes without deployment
 
 ## 📈 Performance Optimization
 
 ### Database Optimization
+
 - **Connection Pooling**: Reuse database connections for efficiency
 - **Query Optimization**: Efficient queries with proper indexing
 - **Migration Strategy**: Zero-downtime database migrations
 
 ### Caching Strategy
+
 - **Redis Integration**: In-memory caching for frequent data
 - **Cache Invalidation**: Proper cache invalidation strategies
 - **Session Management**: Redis-based session storage
 
 ### API Optimization
+
 - **Response Compression**: Gzip compression for API responses
 - **Pagination**: Efficient data pagination for large datasets
 - **Rate Limiting**: API rate limiting to prevent abuse
@@ -224,6 +242,7 @@ fastapi-base/
 ## 🔄 Development Workflow
 
 ### Code Quality Pipeline
+
 1. **Pre-commit Hooks**: Automated checks before commits
 2. **Linting & Formatting**: Code quality enforcement
 3. **Type Checking**: Static type analysis with mypy
@@ -231,6 +250,7 @@ fastapi-base/
 5. **Code Review**: Peer review process for all changes
 
 ### Continuous Integration
+
 - **GitHub Actions**: Automated CI/CD pipeline
 - **Test Execution**: Automated test running on pull requests
 - **Code Coverage**: Coverage reporting and enforcement
