@@ -15,28 +15,33 @@
 ## Getting Started
 
 1. **Fork the repository** and clone your fork locally:
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/fastapi-base.git
    cd fastapi-base
    ```
 
 2. **Copy the environment file**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Install dependencies**:
+
    ```bash
    cd fastapi-base
    uv sync
    ```
 
 4. **Set up pre-commit hooks**:
+
    ```bash
    make hooks
    ```
 
 5. **Build and start the project**:
+
    ```bash
    make build
    ```
@@ -55,16 +60,19 @@
 ### Development Setup
 
 1. **Start the development environment**:
+
    ```bash
    make up
    ```
 
 2. **Access the application container**:
+
    ```bash
    make bash
    ```
 
 3. **Run database migrations** (first time setup):
+
    ```bash
    make alembic-init
    make alembic-migrate
@@ -130,9 +138,11 @@ def example_function(param1: str, param2: int) -> bool:
 
 - Tests are located in `src/tests/` directory.
 - **Run all tests** with:
+
   ```bash
   make test
   ```
+
 - Add tests for new features and bug fixes.
 - Ensure test coverage does not decrease.
 - Use meaningful test names that describe what is being tested.
@@ -153,12 +163,14 @@ tests/
 Follow these guidelines when writing tests:
 
 1. **Use descriptive test names**:
+
    ```python
    def test_user_creation_with_valid_data():
        # Test implementation
    ```
 
 2. **Use fixtures for common setup**:
+
    ```python
    @pytest.fixture
    def sample_user():
@@ -166,6 +178,7 @@ Follow these guidelines when writing tests:
    ```
 
 3. **Test both success and failure cases**:
+
    ```python
    def test_login_success():
        # Test successful login
@@ -175,6 +188,7 @@ Follow these guidelines when writing tests:
    ```
 
 4. **Use appropriate assertions**:
+
    ```python
    assert response.status_code == 200
    assert "error" not in response.json()
@@ -185,6 +199,7 @@ Follow these guidelines when writing tests:
 ### Creating a Feature Branch
 
 1. **Create feature branches** from `main`:
+
    ```bash
    git checkout main
    git pull origin main
@@ -194,6 +209,7 @@ Follow these guidelines when writing tests:
 ### Before Opening a PR
 
 2. **Ensure your code passes all checks**:
+
    ```bash
    make precommit-run    # Run all pre-commit hooks
    make test             # Run test suite
@@ -207,6 +223,7 @@ Follow these guidelines when writing tests:
 ### Pull Request Process
 
 4. **Push your changes**:
+
    ```bash
    git push origin feature/my-new-feature
    ```
@@ -237,6 +254,7 @@ type(scope): description
 ```
 
 **Types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -246,6 +264,7 @@ type(scope): description
 - `chore:` - Maintenance tasks
 
 **Examples:**
+
 ```
 feat(auth): add JWT token authentication
 fix(api): resolve user creation validation error
@@ -259,5 +278,5 @@ docs(readme): update installation instructions
 
 ## Contact
 
-- **Maintainer**: GabrielVGS (gabriel.viana.rs@gmail.com)
+- **Maintainer**: GabrielVGS (<gabriel.viana.rs@gmail.com>)
 - For major changes, please open an issue first to discuss your proposal.

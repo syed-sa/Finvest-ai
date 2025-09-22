@@ -123,6 +123,7 @@ ignore_missing_imports = true
 dev = [
     "black>=25.1.0",
     "bump-pydantic>=0.8.0",
+    "detect-secrets>=1.5.0",
     "isort>=6.0.1",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
