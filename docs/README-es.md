@@ -55,17 +55,20 @@ Este proyecto fue creado usando la excelente plantilla [cookiecutter-fastapi-bac
 ### Ejecutar con Docker (Recomendado)
 
 1. **Clonar el repositorio**:
+
    ```bash
    git clone https://github.com/GabrielVGS/fastapi-base.git
    cd fastapi-base
    ```
 
 2. **Copiar variables de entorno**:
+
    ```bash
    cp .env.example .env
    ```
 
 3. **Iniciar los servicios**:
+
    ```bash
    make up
    ```
@@ -81,21 +84,25 @@ Este proyecto fue creado usando la excelente plantilla [cookiecutter-fastapi-bac
 ### Configuración del Entorno Local
 
 1. **Instalar uv** (si no está ya instalado):
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
 2. **Navegar al directorio del proyecto**:
+
    ```bash
    cd fastapi-base/
    ```
 
 3. **Instalar dependencias**:
+
    ```bash
    uv sync
    ```
 
 4. **Instalar hooks pre-commit**:
+
    ```bash
    make hooks
    ```
@@ -103,16 +110,19 @@ Este proyecto fue creado usando la excelente plantilla [cookiecutter-fastapi-bac
 ### Migraciones de Base de Datos
 
 Inicializar la primera migración (el proyecto debe estar ejecutándose con `docker compose up` y no contener archivos 'version'):
+
 ```bash
 make alembic-init
 ```
 
 Crear nuevo archivo de migración:
+
 ```bash
 make alembic-make-migrations "describe sus cambios"
 ```
 
 Aplicar migraciones:
+
 ```bash
 make alembic-migrate
 ```
@@ -120,6 +130,7 @@ make alembic-migrate
 ### Flujo de Trabajo de Migraciones
 
 Después de cada migración, puede crear nuevas migraciones y aplicarlas con:
+
 ```bash
 make alembic-make-migrations "describe sus cambios"
 make alembic-migrate
@@ -130,6 +141,7 @@ make alembic-migrate
 Cree un archivo `.env` basado en `.env.example`:
 
 ### Configuración de Aplicación
+
 - `PROJECT_NAME` - Nombre del proyecto (por defecto: fastapi-base)
 - `VERSION` - Versión de la API (por defecto: v1)
 - `DEBUG` - Habilitar modo debug (por defecto: True)
@@ -137,6 +149,7 @@ Cree un archivo `.env` basado en `.env.example`:
 - `ENV` - Entorno (dev/staging/production)
 
 ### Configuración de Base de Datos
+
 - `POSTGRES_USER` - Nombre de usuario PostgreSQL
 - `POSTGRES_PASSWORD` - Contraseña PostgreSQL
 - `POSTGRES_DB` - Nombre de la base de datos
@@ -145,11 +158,13 @@ Cree un archivo `.env` basado en `.env.example`:
 - `POSTGRES_URL` - URL completa de la base de datos (opcional, auto-generada si no se proporciona)
 
 ### Configuración Redis
+
 - `REDIS_HOST` - Host Redis (por defecto: redis)
 - `REDIS_PORT` - Puerto Redis (por defecto: 6379)
 - `REDIS_URL` - URL completa Redis (opcional, auto-generada si no se proporciona)
 
 ### Configuraciones Opcionales
+
 - `SENTRY_DSN` - DSN de seguimiento de errores Sentry
 - `LOG_LEVEL` - Nivel de logging (por defecto: INFO)
 - `CACHE_TTL` - Tiempo de vida del caché en segundos (por defecto: 60)
@@ -219,6 +234,7 @@ make hooks          # Instalar hooks pre-commit
 Por defecto, las dependencias se gestionan con [uv](https://docs.astral.sh/uv/). Por favor visite el enlace e instálelo.
 
 Desde `./fastapi-base/` puede instalar todas las dependencias con:
+
 ```bash
 uv sync
 ```
@@ -226,11 +242,13 @@ uv sync
 ### Hooks Pre-commit
 
 El proyecto usa hooks pre-commit para asegurar la calidad del código. Instálelos con:
+
 ```bash
 make hooks
 ```
 
 Esto instalará hooks que se ejecutan automáticamente antes de cada commit para:
+
 - Formatear código con `black`
 - Ordenar imports con `isort`
 - Analizar código con `ruff`
@@ -240,11 +258,13 @@ Esto instalará hooks que se ejecutan automáticamente antes de cada commit para
 ## 🧪 Pruebas
 
 Ejecutar la suite completa de pruebas:
+
 ```bash
 make test
 ```
 
 Ejecutar pruebas específicas:
+
 ```bash
 # Dentro del contenedor
 docker compose exec fastapi-base pytest tests/test_specific.py
@@ -258,6 +278,7 @@ uv run pytest tests/test_specific.py
 El proyecto incluye configuraciones Docker listas para producción:
 
 ### Usando Dockerfile de Producción
+
 ```bash
 # Construir imagen de producción
 docker build -f ops/production.Dockerfile -t fastapi-base:prod .
@@ -267,6 +288,7 @@ docker run -p 8000:8000 --env-file .env fastapi-base:prod
 ```
 
 ### Consideraciones Específicas del Entorno
+
 - Establecer `DEBUG=False` en producción
 - Usar `SECRET_KEY` apropiada
 - Configurar `SENTRY_DSN` para seguimiento de errores
