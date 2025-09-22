@@ -40,11 +40,12 @@ repos:
         types_or: [css, javascript, ts, tsx, json, markdown, yaml]
 
   # Dockerfile linting
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint
-        files: ^.*Dockerfile.*$
+  # needs to be fixed to work on CI
+  #   - repo: https://github.com/hadolint/hadolint
+  #     rev: v2.12.0
+  #     hooks:
+  #       - id: hadolint
+  #         files: ^.*Dockerfile.*$
 
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
