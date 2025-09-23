@@ -15,6 +15,7 @@ from src.interfaces.repository import IRepository
 from src.repositories.results import TimeBasedPaginationResult
 from src.repositories.types import CreateSchemaType, ModelType, UpdateSchemaType
 
+
 logger: logging.Logger = logging.getLogger(__name__)
 
 
