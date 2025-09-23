@@ -59,8 +59,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="fastapi-base",
-    description="base project for fastapi backend",
+    title=settings.PROJECT_NAME,
+    description=settings.PROJECT_DESCRIPTION,
     version=settings.VERSION,
     openapi_url=f"/{settings.VERSION}/openapi.json",
     openapi_tags=tags_metadata,
