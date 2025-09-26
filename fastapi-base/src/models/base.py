@@ -25,7 +25,7 @@ class BaseModel(SQLModel):
         default_factory=uuid_ext_pkg.uuid7,
         primary_key=True,
         index=True,
-        sa_column_kwargs={"unique": True},
+        sa_column_kwargs={"server_default": expression.text("uuid7()"), "unique": True},
     )
 
     created_at: Optional[datetime] = Field(
