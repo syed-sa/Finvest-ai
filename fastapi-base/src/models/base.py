@@ -20,28 +20,18 @@ class BaseModel(SQLModel):
         default=None,
         primary_key=True,
         index=True,
-        sa_column=Column(BigInteger, autoincrement=True),
     )
-    created_at: Optional[datetime] = Field(
-        default_factory=datetime.utcnow,
-        sa_column=Column(
-            DateTime(timezone=True),
-            server_default=utcnow(),
-            nullable=True,
-        ),
-    )
-    updated_at: Optional[datetime] = Field(
-        default_factory=datetime.utcnow,
-        sa_column=Column(
-            DateTime(timezone=True),
-            onupdate=utcnow(),
-            nullable=True,
-        ),
-    )
-    deleted_at: Optional[datetime] = Field(
-        default=None,
-        sa_column=Column(
-            DateTime(timezone=True),
-            nullable=True,
-        ),
-    )
+    # created_at: Optional[datetime] = Field(
+    #     sa_column=Column(
+    #         DateTime(timezone=True),
+    #         server_default=utcnow(),
+    #         nullable=True,
+    #     ),
+    # )
+    # updated_at: Optional[datetime] = Field(
+    #     sa_column=Column(
+    #         DateTime(timezone=True),
+    #         onupdate=utcnow(),
+    #         nullable=True,
+    #     ),
+    # )

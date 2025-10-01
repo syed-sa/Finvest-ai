@@ -27,9 +27,7 @@ alembic-init:
 	docker compose exec fastapi-base alembic revision --autogenerate -m "init"
 
 alembic-make-migrations:
-	@read -p "Enter migration message: " comment; \
-	echo "Creating migration file: $$comment"; \
-	docker compose exec fastapi-base alembic revision --autogenerate -m "$$comment"
+	docker compose exec fastapi-base alembic revision --autogenerate -m "Creating migration"
 
 alembic-migrate:
 	@echo "applying migration...."
