@@ -1,11 +1,9 @@
 # User model
-from typing import List, Optional
-from xmlrpc.client import Boolean
+from typing import Optional
 
 from sqlmodel import (
     Column,
     Field,
-    Relationship,
     String,
 )
 
@@ -13,15 +11,9 @@ from sqlmodel import (
 from src.models.base import BaseModel
 
 class User(BaseModel, table=True):
-    __tablename__ = "users"
-
-    user_name: str = Field(sa_column=Column(String(255), nullable=False))
-    email: Optional[str] = Field(
-        default=None, sa_column=Column(String(255), unique=True, nullable=True)
-    )
+    __tablename__ = "user"
     
-    hashed_password: str = Field(sa_column=Column(String(255), nullable=False))
+    user_name: str = Field(min_length=1)
+    email: str | None = Field(default=None, unique=True, regex=r'^[^@]+@[^@]+\.[^@]+$')
+    hashed_password: str = Field(min_length=1)
 
-    is_active: bool = Field(default=True)
-
-    # Use List, not Optional[list]

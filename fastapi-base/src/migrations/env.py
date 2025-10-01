@@ -11,10 +11,10 @@ from sqlmodel import SQLModel
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from src.core.config import settings  # noqa
-from src.models.chat import ChatSession, Message
 
-# import all your models so they are registered with SQLModel.metadata
-from src.models.user import User
+# from src.models.chat import ChatSession
+# from src.models.user import User
+from src.models.base import User, ChatSession, Message
 
 # assign SQLModel unified metadata for Alembic's autogenerate support
 target_metadata = SQLModel.metadata
