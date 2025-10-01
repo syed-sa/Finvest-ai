@@ -37,10 +37,10 @@ tags_metadata = [
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await add_postgresql_extension()
-    redis_client = await get_redis_client()
+    # redis_client = await get_redis_client()
 
-    # Initialize FastAPI-Cache with Redis backend
-    FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
+    # # Initialize FastAPI-Cache with Redis backend
+    # FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
     if settings.SENTRY_DSN:
         sentry_sdk.init(
@@ -54,9 +54,9 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    if redis_client:
-        await redis_client.close()
-        logger.info("Redis connection closed.")
+    # if redis_client:
+    #     await redis_client.close()
+    #     logger.info("Redis connection closed.")
 
 
 app = FastAPI(
