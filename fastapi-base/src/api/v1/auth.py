@@ -9,6 +9,7 @@ from src.core.exceptions import ObjectNotFound
 from src.schemas.common import IResponseBase
 from src.api.common import create_access_token
 from src.core.config import settings
+from fastapi import Request
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -22,12 +23,19 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     if not user:
         raise ObjectNotFound(f"User with email {request.email} not found")
     access_token = create_access_token({"user_id": user.id})
-    refresh_token = create_access_token({}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS))
+    refresh_token = create_access_token(
+        {}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+    )
     # Implement login logic here (authenticate and return token)
     return IResponseBase[dict](
-        message="Login endpoint", data={"access_token": access_token, "refresh_token": refresh_token}
+        message="Login successful",
+        data={"access_token": access_token, "refresh_token": refresh_token},
     )
-
+    
+@router.get("/validate")
+async def validate_login(request: Request):
+    pass
+    
 
 @router.post("/signup")
 async def signup(request: SignupRequest):
