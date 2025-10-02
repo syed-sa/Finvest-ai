@@ -11,6 +11,7 @@ from fastapi_pagination import add_pagination
 
 from src.api import routes
 from src.api.deps import get_redis_client
+from src.api.middlewares import JWTAuthMiddleware, GlobalExceptionHandlerMiddleware
 from src.core.backends import RedisBackend
 from src.core.config import settings
 from src.db.session import add_postgresql_extension
@@ -67,8 +68,8 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
-
+app.add_middleware(JWTAuthMiddleware)
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
+app.add_middleware(GlobalExceptionHandlerMiddleware)
 add_pagination(app)
-app.include_router(routes.home_router)
-app.include_router(routes.api_router, prefix=f"/{settings.VERSION}")
+app.include_router(routes.api_router, prefix=f"/api/{settings.VERSION}")

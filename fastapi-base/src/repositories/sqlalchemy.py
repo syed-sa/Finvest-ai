@@ -8,7 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlmodel import select
+from sqlmodel import select, SQLModel 
 
 from src.core.exceptions import ObjectNotFound, RepositoryError
 from src.interfaces.repository import IRepository
@@ -32,11 +32,12 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         UpdateSchemaType: The Pydantic model for updating existing objects
     """
 
-    _model: Type[ModelType]
+    _model: Type[ModelType] = ModelType
 
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, model: SQLModel, db: AsyncSession) -> None:
         """Initialize the repository with a database session."""
         self.db = db
+        self._model = model
 
     async def create(self, obj_in: CreateSchemaType, **kwargs: Any) -> ModelType:
         """

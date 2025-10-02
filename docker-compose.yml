@@ -14,15 +14,13 @@ services:
         env: ${ENV}
     ports:
       - "8666:8000"
-    command: |
-      bash -c "
-      gunicorn src.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --log-level=debug --timeout=60 --reload"
+    command: >
+      uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
-      - PYTHONUNBUFFERED=0
+      - PYTHONUNBUFFERED=1
     volumes:
       - base-data:/data
       - ./fastapi-base/src:/code/src
       - ./fastapi-base/tests:/code/tests
       - ./fastapi-base/alembic.ini:/code/alembic.ini
       - ./fastapi-base/logconfig.yml:/code/logconfig.yml
- 
