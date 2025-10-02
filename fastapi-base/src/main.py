@@ -68,14 +68,14 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     lifespan=lifespan,
 )
-app.add_middleware(JWTAuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],            # allows all origins
-    allow_credentials=True,         # allows cookies, authorization headers
-    allow_methods=["*"],            # allows all HTTP methods
-    allow_headers=["*"],            # allows all headers
+    allow_origins=["*"],  
+    allow_credentials=True,  
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
+app.add_middleware(JWTAuthMiddleware)
 app.add_middleware(GlobalExceptionHandlerMiddleware)
 add_pagination(app)
 app.include_router(routes.api_router, prefix=f"/api/{settings.VERSION}")

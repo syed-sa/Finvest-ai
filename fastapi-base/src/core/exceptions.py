@@ -1,10 +1,28 @@
 class BaseBackendException(Exception):
-    pass
+    status_code: int = 500
+    message: str = "An error occurred"
+    detail: str = "An unexpected error occured. Please contact support."
+    status: bool = False
+
+    def __init__(self, message: str | None = None, detail: str | None = None):
+        super().__init__(message or self.message)
+        self.message = message or self.message
+        self.detail = detail or self.detail
 
 
 class ObjectNotFound(BaseBackendException):
-    pass
-
+    status_code = 404
+    message = "Resource not found"
 
 class RepositoryError(BaseBackendException):
-    pass
+    status_code = 500
+    message = "Database error"
+    
+class UnAuthorized(BaseBackendException):
+    status_code = 401
+    message = "Unauthorized access"
+
+
+class Forbidden(BaseBackendException):
+    status_code = 403
+    message = "Forbidden access"

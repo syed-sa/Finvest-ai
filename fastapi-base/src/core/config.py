@@ -74,5 +74,4 @@ class Settings(BaseSettings):
 
         return f"redis://{values.data.get('REDIS_HOST')}:{values.data.get('REDIS_PORT')}"
 
-
 settings = Settings()

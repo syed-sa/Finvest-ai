@@ -10,6 +10,7 @@ class IResponseBase(BaseModel, Generic[T]):  # type: ignore
     message: str = ""
     meta: Optional[Dict[str, Any]] = {}
     data: Optional[T] = None
+    status: bool = True
 
 
 class IGetResponseBase(IResponseBase[T], Generic[T]):

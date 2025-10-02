@@ -17,7 +17,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update(
-        {"exp": expire.isoformat(), "iat": datetime.now().isoformat(), "type": "access"}
+        {
+            "exp": int(expire.timestamp()),  # expiration as integer timestamp
+            "iat": int(datetime.now().timestamp()),  # issued at as integer timestamp (UTC)
+            "type": "access",
+        }
     )
 
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
