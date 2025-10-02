@@ -7,7 +7,6 @@ from src.core.config import settings
 
 router = APIRouter()
 
-
 class HealthCheckResponse(BaseModel):
     status: str = "ok"
 
@@ -18,13 +17,3 @@ async def pong() -> HealthCheckResponse:
     # some async operation could happen here
     # example: `data = await get_all_datas()`
     return HealthCheckResponse()
-
-
-# # Example route
-# @router.get("/users", response_model=IGetResponseBase[list[UserRead]], tags=["users"])
-# async def get_users(db=Depends(get_db)):
-#     user_repo = UserRepository(db)
-
-#     users = await user_repo.all()
-
-#     return IGetResponseBase[list[User]](data=users)

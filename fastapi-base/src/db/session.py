@@ -26,7 +26,5 @@ async def add_postgresql_extension() -> None:
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    # expire_on_commit=False will prevent attributes from being expired
-    # after commit.
     async with AsyncSessionLocal() as session:
         yield session
