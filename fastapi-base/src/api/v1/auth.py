@@ -88,8 +88,10 @@ async def signup(
         user = await user_repo.create_from_dict(user_data)
         
         # Create tokens
-        access_token = create_access_token({"user_id": user.id})
-        refresh_token = create_access_token({}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS))
+        access_token = create_access_token({"user_id": user.id, "username": user.user_name})
+        refresh_token = create_access_token(
+            {}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+        )
         
         return IResponseBase[dict](
             message="User created successfully",
