@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi_pagination import Page
 
@@ -68,3 +68,7 @@ class IRepository(metaclass=ABCMeta):
         """Get a single object by username."""
         pass
 
+    @abstractmethod
+    async def create_from_dict(self, data: Dict[str, Any], **kwargs: Any) -> ModelType:
+        """Create a new object from a dictionary."""
+        pass

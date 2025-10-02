@@ -85,7 +85,7 @@ async def signup(
         }
         
         # Create the user
-        user = await user_repo.create(user_data)
+        user = await user_repo.create_from_dict(user_data)
         
         # Create tokens
         access_token = create_access_token({"user_id": user.id})
