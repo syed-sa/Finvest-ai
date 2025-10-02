@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,Request
 from src.schemas.auth import LoginRequest, SignupRequest
 from src.api.deps import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +25,7 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     refresh_token = create_access_token({}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS))
     # Implement login logic here (authenticate and return token)
     return IResponseBase[dict](
-        message="Login endpoint", data={"access_token": access_token, "refresh_token": refresh_token}
+        message="Login successful", data={"access_token": access_token, "refresh_token": refresh_token}
     )
 
 
@@ -33,3 +33,20 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
 async def signup(request: SignupRequest):
     # Implement signup logic here (create user in DB)
     return {"message": "Signup endpoint", "username": request.username}
+
+@router.get("/validate")
+async def get_current_user(request: Request):
+    """
+    Dependency to extract user info from JWTAuthMiddleware.
+    Returns only status and username.
+    """
+    if not hasattr(request.state, "username"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+
+    return {
+        "status": true,
+        "username": request.state.username,
+    }
