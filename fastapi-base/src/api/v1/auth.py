@@ -22,7 +22,7 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     )  # need to hash
     if not user:
         raise ObjectNotFound(f"User with email {request.email} not found")
-    access_token = create_access_token({"user_id": user.id})
+    access_token = create_access_token({"user_id": user.id,"username":user.user_name})
     refresh_token = create_access_token(
         {}, expires_delta=timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     )
@@ -53,8 +53,8 @@ async def get_current_user(request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
         )
-
-    return {
-        "status": true,
-        "username": request.state.username,
-    }
+    
+    return IResponseBase[dict](
+      status=True,
+       username=request.state.user_name,
+    )
