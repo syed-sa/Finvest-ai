@@ -789,11 +789,8 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         logger.debug(f"Fetching {self._model.__name__} by username: {username}")
 
         try:
-            # Check if the model has a username field (could be 'username' or 'user_name')
             username_field = None
-            if hasattr(self._model, 'username'):
-                username_field = 'username'
-            elif hasattr(self._model, 'user_name'):
+            if hasattr(self._model, 'user_name'):
                 username_field = 'user_name'
             else:
                 raise RepositoryError(
