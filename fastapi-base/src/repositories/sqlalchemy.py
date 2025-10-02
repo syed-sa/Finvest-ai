@@ -725,3 +725,92 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
     async def f(self, **kwargs: Any) -> List[ModelType]:
         """Find all objects matching the given filter criteria."""
         return await self.filter_by(kwargs)
+    
+    async def get_by_email(
+        self, 
+        email: str, 
+        raise_if_not_found: bool = True
+    ) -> Optional[ModelType]:
+        """
+        Get a single object by email address.
+
+        Args:
+            email: The email address to search for
+            raise_if_not_found: Whether to raise exception if object not found
+
+        Returns:
+            The found object or None
+
+        Raises:
+            ObjectNotFound: If no object matches the email and raise_if_not_found is True
+            RepositoryError: If the model doesn't have an email field or query fails
+        """
+        logger.debug(f"Fetching {self._model.__name__} by email: {email}")
+
+        try:
+            # Check if the model has an email field
+            if not hasattr(self._model, 'email'):
+                raise RepositoryError(
+                    f"Model {self._model.__name__} does not have an 'email' field"
+                )
+
+            query = select(self._model).where(self._model.email == email)  # type: ignore
+            result = await self.db.execute(query)
+            obj = result.scalar_one_or_none()
+
+            if not obj and raise_if_not_found:
+                raise ObjectNotFound(f"{self._model.__name__} with email {email} not found")
+
+            return obj
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to get {self._model.__name__} by email {email}: {exc}")
+            raise RepositoryError(f"Failed to get object by email: {str(exc)}") from exc
+        
+    async def get_by_username(
+        self, 
+        username: str, 
+        raise_if_not_found: bool = True
+    ) -> Optional[ModelType]:
+        """
+        Get a single object by username.
+
+        Args:
+            username: The username to search for
+            raise_if_not_found: Whether to raise exception if object not found
+
+        Returns:
+            The found object or None
+
+        Raises:
+            ObjectNotFound: If no object matches the username and raise_if_not_found is True
+            RepositoryError: If the model doesn't have a username field or query fails
+        """
+        logger.debug(f"Fetching {self._model.__name__} by username: {username}")
+
+        try:
+            # Check if the model has a username field (could be 'username' or 'user_name')
+            username_field = None
+            if hasattr(self._model, 'username'):
+                username_field = 'username'
+            elif hasattr(self._model, 'user_name'):
+                username_field = 'user_name'
+            else:
+                raise RepositoryError(
+                    f"Model {self._model.__name__} does not have a username field"
+                )
+
+            query = select(self._model).where(getattr(self._model, username_field) == username)  # type: ignore
+            result = await self.db.execute(query)
+            obj = result.scalar_one_or_none()
+
+            if not obj and raise_if_not_found:
+                raise ObjectNotFound(f"{self._model.__name__} with username {username} not found")
+
+            return obj
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to get {self._model.__name__} by username {username}: {exc}")
+            raise RepositoryError(f"Failed to get object by username: {str(exc)}") from exc
+        
+    
