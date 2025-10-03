@@ -26,3 +26,13 @@ class UnAuthorized(BaseBackendException):
 class Forbidden(BaseBackendException):
     status_code = 403
     message = "Forbidden access"
+
+class BadRequest(BaseBackendException):
+    status_code = 400
+    message = "Bad request"
+    detail = "Invalid input provided."
+
+class Conflict(BaseBackendException):
+    status_code = 409
+    message = "Conflict"
+    detail = "The resource already exists or has a conflict."

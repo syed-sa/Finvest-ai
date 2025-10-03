@@ -57,18 +57,8 @@ class IRepository(metaclass=ABCMeta):
     def get_or_create(self, obj_in: Any, **kwargs: Any) -> Any:
         """Get or create an instance"""
         raise NotImplementedError
-    
-    @abstractmethod
-    async def get_by_email(self, email: str, raise_if_not_found: bool = True) -> Optional[ModelType]:
-        """Get a single object by email address."""
-        pass
-
-    @abstractmethod
-    async def get_by_username(self, username: str, raise_if_not_found: bool = True) -> Optional[ModelType]:
-        """Get a single object by username."""
-        pass
 
     @abstractmethod
     async def create_from_dict(self, data: Dict[str, Any], **kwargs: Any) -> ModelType:
         """Create a new object from a dictionary."""
-        pass
+        raise NotImplementedError

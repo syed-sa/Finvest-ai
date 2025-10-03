@@ -131,6 +131,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Raises:
             ObjectNotFound: If no object matches the criteria and raise_if_not_found is True
+            RepositoryError: If database operation fails
         """
         logger.debug(f"Fetching {self._model.__name__} by {kwargs}")
 
@@ -766,49 +767,6 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
         except SQLAlchemyError as exc:
             logger.error(f"Failed to get {self._model.__name__} by email {email}: {exc}")
             raise RepositoryError(f"Failed to get object by email: {str(exc)}") from exc
-        
-    async def get_by_username(
-        self, 
-        username: str, 
-        raise_if_not_found: bool = True
-    ) -> Optional[ModelType]:
-        """
-        Get a single object by username.
-
-        Args:
-            username: The username to search for
-            raise_if_not_found: Whether to raise exception if object not found
-
-        Returns:
-            The found object or None
-
-        Raises:
-            ObjectNotFound: If no object matches the username and raise_if_not_found is True
-            RepositoryError: If the model doesn't have a username field or query fails
-        """
-        logger.debug(f"Fetching {self._model.__name__} by username: {username}")
-
-        try:
-            username_field = None
-            if hasattr(self._model, 'user_name'):
-                username_field = 'user_name'
-            else:
-                raise RepositoryError(
-                    f"Model {self._model.__name__} does not have a username field"
-                )
-
-            query = select(self._model).where(getattr(self._model, username_field) == username)  # type: ignore
-            result = await self.db.execute(query)
-            obj = result.scalar_one_or_none()
-
-            if not obj and raise_if_not_found:
-                raise ObjectNotFound(f"{self._model.__name__} with username {username} not found")
-
-            return obj
-
-        except SQLAlchemyError as exc:
-            logger.error(f"Failed to get {self._model.__name__} by username {username}: {exc}")
-            raise RepositoryError(f"Failed to get object by username: {str(exc)}") from exc
         
 
     async def create_from_dict(self, data: Dict[str, Any], **kwargs: Any) -> ModelType:
