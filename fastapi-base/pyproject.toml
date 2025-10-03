@@ -26,6 +26,8 @@ dependencies = [
     "python-jose[cryptography]>=3.3.0",
     "PyJWT>=2.8.0",
     "pydantic[email]>=2.11.7",
+    "langchain>=0.3.27",
+    "openapi>=2.0.0",
 ]
 
 [tool.isort]
