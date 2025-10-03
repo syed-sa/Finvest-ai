@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.api.v1 import health, auth
+from src.api.v1 import health, auth ,chat
 
 
 # To include more routes go as
@@ -10,3 +10,4 @@ from src.api.v1 import health, auth
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
+api_router.include_router(chat.router)
