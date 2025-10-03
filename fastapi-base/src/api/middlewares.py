@@ -60,6 +60,8 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
 
     def _should_skip_auth(self, request: Request) -> bool:
         """Check if the request path should skip authentication"""
+        if request.method == "OPTIONS":
+              return True
         path = request.url.path
         return any(exclude_path in path for exclude_path in self.exclude_paths)
 
