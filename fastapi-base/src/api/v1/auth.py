@@ -9,7 +9,7 @@ from src.core.exceptions import Conflict, ObjectNotFound, RepositoryError, UnAut
 from src.schemas.common import IResponseBase
 from src.api.common import create_access_token
 from src.core.config import settings
-from src.core.security import get_password_hash, verify_password
+from src.core.security import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/login")
 async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     user_repo = BaseSQLAlchemyRepository[User, LoginRequest, SignupRequest](User, db)
-    user = await user_repo.get(email=request.email) 
+    user = await user_repo.get(email=request.email)
     if not user:
         raise ObjectNotFound(f"User with email {request.email} not found", "Email does not exist")
 
@@ -50,11 +50,9 @@ async def get_current_user(request: Request):
         data={"username": request.state.username},
     )
 
+
 @router.post("/signup", response_model=IResponseBase[None])
-async def signup(
-    request: SignupRequest,
-    db: AsyncSession = Depends(get_db)
-):
+async def signup(request: SignupRequest, db: AsyncSession = Depends(get_db)):
     """
     Register a new user
     """
@@ -65,13 +63,13 @@ async def signup(
         raise Conflict(message="Email already registered")
 
     # Hash password
-    hashed_password = get_password_hash(request.password)
+    hashed_password = hash_password(request.password)
 
     # Prepare user data
     user_data = {
         "user_name": request.username,
         "email": request.email,
-        "hashed_password": hashed_password
+        "hashed_password": hashed_password,
     }
 
     # Create user

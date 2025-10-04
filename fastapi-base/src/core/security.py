@@ -1,29 +1,27 @@
 from passlib.context import CryptContext
 
-# Create CryptContext for password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def hash_password(pw: str) -> str:
     """
-    Verify a plain password against a hashed password.
-    
-    Args:
-        plain_password: The plain text password to verify
-        hashed_password: The hashed password to compare against
-        
-    Returns:
-        bool: True if password matches, False otherwise
-    """
-    return pwd_context.verify(plain_password, hashed_password)
+    Hash a password using the Argon2 password hashing algorithm.
 
-def get_password_hash(password: str) -> str:
-    """
-    Hash a plain text password.
-    
-    Args:
-        password: The plain text password to hash
-        
+        pw (str): The password to hash.
+
     Returns:
-        str: The hashed password
+        str: The hashed password.
     """
-    return pwd_context.hash(password)
+    return pwd_context.hash(pw)
+
+def verify_password(pw: str, stored: str) -> bool:
+    """
+    Verify a password against a stored hashed password.
+
+    Args:
+        pw (str): The password to verify.
+        stored (str): The stored hashed password.
+
+    Returns:
+        bool: Whether the password matches the stored hashed password.
+    """
+    return pwd_context.verify(pw, stored)
