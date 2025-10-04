@@ -76,6 +76,6 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 app.add_middleware(JWTAuthMiddleware)
-# app.add_middleware(GlobalExceptionHandlerMiddleware)
+app.add_middleware(GlobalExceptionHandlerMiddleware)
 add_pagination(app)
 app.include_router(routes.api_router, prefix=f"/api/{settings.VERSION}")

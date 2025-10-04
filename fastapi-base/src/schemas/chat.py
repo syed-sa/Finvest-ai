@@ -22,3 +22,8 @@ class ChatSessionCreate(BaseModel):
         if not v.strip():
             raise ValueError("Title must not be empty or only whitespace")
         return v
+    
+class MessageCreate(BaseModel):
+    session_id: int = Field(..., gt=0, description="ID of the chat session")
+    user_message: str = Field(..., min_length=1, description="User's message")
+    ai_reply: str = Field(..., description="AI's reply")
