@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     WEB_CONCURRENCY: int = Field(default=9)
     MAX_OVERFLOW: int = Field(default=64)
     POOL_SIZE: Optional[int] = None
+    GOOGLE_API_URL: str = Field(default="")  # will be loaded from .env
+    GOOGLE_API_KEY: str = Field(default="")
 
     @field_validator("POOL_SIZE", mode="before")
     @classmethod

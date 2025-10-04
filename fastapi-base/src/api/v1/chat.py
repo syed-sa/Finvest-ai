@@ -12,6 +12,7 @@ from src.api.common import create_access_token
 from src.core.config import settings
 from fastapi import Request
 from src.models.chat import ChatSession
+from src.agent.agentRout import AgentRouter,handleLLMResponseText
 from src.repositories.sqlalchemy import BaseSQLAlchemyRepository
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -34,6 +35,24 @@ async def chat(
     session_data = ChatSession(user_id=user_id, title=title)
 
     new_session = await chat_repo.create(session_data)
+
+    # Need to insert user quest in message table with session ID
+
+ # Call the LLM agent
+    text = await AgentRouter(body.user_message)
+
+    # Extract the Action from LLM response
+    action = handleLLMResponseText(text)
+
+    # Route based on Action
+    if action == "MCPTool":
+        result = await call_mcp_gateway(body.user_message, session_id=new_session.id)
+    else:
+        result = await call_cloud_llm(body.user_message, session_id=new_session.id)
+
+
+
+
 
     return IResponseBase[dict](
         message="Chat session created successfully",
