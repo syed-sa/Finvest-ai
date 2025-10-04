@@ -131,6 +131,7 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
 
         Raises:
             ObjectNotFound: If no object matches the criteria and raise_if_not_found is True
+            RepositoryError: If database operation fails
         """
         logger.debug(f"Fetching {self._model.__name__} by {kwargs}")
 
@@ -725,3 +726,50 @@ class BaseSQLAlchemyRepository(IRepository, Generic[ModelType, CreateSchemaType,
     async def f(self, **kwargs: Any) -> List[ModelType]:
         """Find all objects matching the given filter criteria."""
         return await self.filter_by(kwargs)
+        
+
+    async def create_from_dict(self, data: Dict[str, Any], **kwargs: Any) -> ModelType:
+        """
+        Create a new object from a dictionary.
+        
+        Useful when you need to create objects with computed fields (like hashed passwords)
+        without creating a separate schema.
+        
+        Args:
+            data: Dictionary containing the data for the new object
+            **kwargs: Additional options (add, flush, commit, refresh)
+        
+        Returns:
+            The created database object
+        
+        Raises:
+            RepositoryError: If database operation fails
+        """
+        logger.info(f"Creating new {self._model.__name__} object from dict")
+
+        try:
+            db_obj = self._model(**data)
+
+            add = kwargs.get("add", True)
+            flush = kwargs.get("flush", True)
+            commit = kwargs.get("commit", True)
+            refresh = kwargs.get("refresh", True)
+
+            if add:
+                self.db.add(db_obj)
+
+            if add and commit:
+                await self.db.commit()
+                if refresh:
+                    await self.db.refresh(db_obj)
+            elif add and flush:
+                await self.db.flush()
+
+            return db_obj
+
+        except SQLAlchemyError as exc:
+            logger.error(f"Failed to create {self._model.__name__} from dict: {exc}")
+            await self.db.rollback()
+            raise RepositoryError(f"Failed to create object from dict: {str(exc)}") from exc
+            
+        

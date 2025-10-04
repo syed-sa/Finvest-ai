@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi_pagination import Page
+
+from src.repositories.types import CreateSchemaType, ModelType, UpdateSchemaType
 
 
 class IRepository(metaclass=ABCMeta):
@@ -54,4 +56,9 @@ class IRepository(metaclass=ABCMeta):
     @abstractmethod
     def get_or_create(self, obj_in: Any, **kwargs: Any) -> Any:
         """Get or create an instance"""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def create_from_dict(self, data: Dict[str, Any], **kwargs: Any) -> ModelType:
+        """Create a new object from a dictionary."""
         raise NotImplementedError

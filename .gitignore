@@ -54,3 +54,5 @@ node_modules/
 
 # IDE settings
 .vscode/
+
+venv/
