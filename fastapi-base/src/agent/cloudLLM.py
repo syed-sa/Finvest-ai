@@ -1,5 +1,7 @@
 import string
 from src.core.config import settings
+from mcp.client.sse import sse_client
+from mcp import ClientSession
 import httpx
 import asyncio
 import re
@@ -10,7 +12,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 async def mcp_gateway(messsage:string,session_id:int) -> str:
 
-      gateway_url = "http://localhost:8080/sse"
+    gateway_url = "http://localhost:8080/sse"
     async with sse_client(gateway_url) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
