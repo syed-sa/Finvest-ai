@@ -8,9 +8,28 @@ import logging
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-def mcp_gateway(messsage:string,session_id:int) -> str:
+async def mcp_gateway(messsage:string,session_id:int) -> str:
 
-    return "The mcp gateway has been choosed"
+      gateway_url = "http://localhost:8080/sse"
+    async with sse_client(gateway_url) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+
+            tools_response = await session.list_tools()
+            print("Available tools through gateway:")
+            for tool in tools_response.tools:
+                print(f"- {tool.name}: {tool.description}")
+
+            tool_name = "search"
+            args = {"query": "What is stocks?", "max_results": 5}
+
+            print(f"\nCalling tool '{tool_name}' with arguments {args}...")
+            result = await session.call_tool(tool_name, args)
+
+            for content in result.content:
+                if getattr(content, "type", None) == "text":
+                    print(content.text)
+                    break
 
 
 async def cloud_llm(messsage:string,session_id:int) -> str:
