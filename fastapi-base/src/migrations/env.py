@@ -14,7 +14,8 @@ from src.core.config import settings  # noqa
 
 # from src.models.chat import ChatSession
 # from src.models.user import User
-from src.models.base import User, ChatSession, Message
+from src.models.chat import ChatSession, Message
+from src.models.user import User
 
 # assign SQLModel unified metadata for Alembic's autogenerate support
 target_metadata = SQLModel.metadata

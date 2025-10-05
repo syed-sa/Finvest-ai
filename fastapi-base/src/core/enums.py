@@ -18,4 +18,10 @@ class Environment(BaseEnum):
     PRODUCTION = "production"
 
 
+class MessageState(str, Enum):
+    FAILED = "FAILED"
+    FULFILLED = "FULFILLED"
+    PENDING = "PENDING"
+
+
 # pragma: no cover stop

@@ -1,10 +1,8 @@
 from datetime import datetime
-from pydantic import Field as PydanticField
+from enum import Enum
 from sqlmodel import SQLModel, Field
-
 from src.models.base import BaseModel
-
-# # Session model
+from src.core.enums import MessageState
 
 
 class ChatSession(BaseModel, table=True):
@@ -19,4 +17,5 @@ class Message(BaseModel, table=True):
 
     session_id: int = Field(foreign_key="chat_session.id")
     user_message: str = Field(min_length=1)
-    ai_reply: str = Field()
+    ai_reply: str = Field(min_length=1)
+    state: MessageState = Field(description="Current state of the chat")
