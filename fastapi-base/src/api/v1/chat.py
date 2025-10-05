@@ -54,7 +54,7 @@ async def chat(
         ai_reply="",
     )
     message_repo = BaseSQLAlchemyRepository[Message, MessageCreate, None](Message, db)
-    await message_repo.create(message)
+    message = await message_repo.create(message)
     # Explicit commit (optional, already done by db.begin())
     # Call LLM / MCPTool outside transaction if needed
     text = await AgentRouter(body.user_message)
@@ -63,7 +63,7 @@ async def chat(
     if action == "MCPTool":
         result =  mcp_gateway(body.user_message, session_id=session_id)
     else:
-        result =  cloud_llm(body.user_message, session_id=session_id)
+        result = await cloud_llm(body.user_message, session_id=session_id)
 
     # Prepare response message
     message_text = "Chat session created successfully."
@@ -73,6 +73,7 @@ async def chat(
         data={
             "session_id": session_id,
             "title": new_session.title if new_session else None,
+            "message_id":message.id,
             "action_result": result,
             "action":action
         },
