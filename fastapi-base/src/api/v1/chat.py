@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request,Query
 from src.schemas.chat import ChatRequest, ChatSessionCreate, MessageCreate
 from src.api.deps import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,12 +12,9 @@ from src.schemas.chat import ChatRequest
 from src.api.common import create_access_token
 from src.core.config import settings
 from fastapi_pagination import Params, Page
-from fastapi import Request, Query
 from src.models.chat import ChatSession, Message
 from src.agent.agentRout import AgentRouter, handleLLMResponseText
 from src.repositories.sqlalchemy import BaseSQLAlchemyRepository
-from fastapi import Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from src.agent.cloudLLM import mcp_gateway, cloud_llm
 
 router = APIRouter(prefix="/chat", tags=["chat"])
