@@ -16,6 +16,7 @@ from src.agent.agentRout import AgentRouter, handleLLMResponseText
 from src.repositories.sqlalchemy import BaseSQLAlchemyRepository
 from fastapi import Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.agent.cloudLLM import mcp_gateway,cloud_llm
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -34,39 +35,35 @@ async def chat(
     user_id = request.state.user_id
     new_session = None
 
-    try:
-        # If no session_id is provided, create a new session
-        if not session_id:
-            chat_repo = BaseSQLAlchemyRepository[ChatSession, ChatSessionCreate, None](
-                ChatSession, db
-            )
-            title = " ".join(body.user_message.split()[:3])
-            session_data = ChatSession(user_id=user_id, title=title)
-
-            new_session = await chat_repo.create(session_data)
-            session_id = new_session.id
-
-        # Create message entry
-        message = Message(
-            user_message=body.user_message,
-            session_id=session_id,
-            ai_reply="",
+    
+    # If no session_id is provided, create a new session
+    if not session_id:
+        chat_repo = BaseSQLAlchemyRepository[ChatSession, ChatSessionCreate, None](
+            ChatSession, db
         )
-        message_repo = BaseSQLAlchemyRepository[Message, MessageCreate, None](Message, db)
-        await message_repo.create(message)
-        # Explicit commit (optional, already done by db.begin())
-        # Call LLM / MCPTool outside transaction if needed
-        text = await AgentRouter(body.user_message)
-        action = handleLLMResponseText(text)
+        title = " ".join(body.user_message.split()[:3])
+        session_data = ChatSession(user_id=user_id, title=title)
 
-        if action == "MCPTool":
-            result = await call_mcp_gateway(body.user_message, session_id=session_id)
-        else:
-            result = await call_cloud_llm(body.user_message, session_id=session_id)
+        new_session = await chat_repo.create(session_data)
+        session_id = new_session.id
 
-    except Exception:
-        await db.rollback()  # rollback on error
-        raise
+    # Create message entry
+    message = Message(
+        user_message=body.user_message,
+        session_id=session_id,
+        ai_reply="",
+    )
+    message_repo = BaseSQLAlchemyRepository[Message, MessageCreate, None](Message, db)
+    await message_repo.create(message)
+    # Explicit commit (optional, already done by db.begin())
+    # Call LLM / MCPTool outside transaction if needed
+    text = await AgentRouter(body.user_message)
+    action = handleLLMResponseText(text)
+
+    if action == "MCPTool":
+        result =  mcp_gateway(body.user_message, session_id=session_id)
+    else:
+        result =  cloud_llm(body.user_message, session_id=session_id)
 
     # Prepare response message
     message_text = "Chat session created successfully."
@@ -77,5 +74,6 @@ async def chat(
             "session_id": session_id,
             "title": new_session.title if new_session else None,
             "action_result": result,
+            "action":action
         },
     )

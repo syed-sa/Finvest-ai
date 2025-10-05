@@ -2,10 +2,18 @@ from src.core.config import settings
 import httpx
 import asyncio
 import re
+import logging
 
 
+logger: logging.Logger = logging.getLogger(__name__)
 
 async def AgentRouter(query: str) -> str:
+    """
+    Routes the query to the appropriate tool using the Gemini API.
+    Includes full error handling, safe response parsing, and logging.
+    """
+    logger.info(f"[AgentRouter] Query: {query}")
+
     prompt = f"""
 You are an intelligent agent with the following tools:
 1. KnowledgeTool — use for general knowledge or explanations.
@@ -37,18 +45,50 @@ User Query: {query}
         ]
     }
 
-    headers = {"X-Goog-Api-Key": settings.GOOGLE_API_KEY, "Content-Type": "application/json"}
+    headers = {
+        "X-Goog-Api-Key": settings.GOOGLE_API_KEY,
+        "Content-Type": "application/json"
+    }
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(settings.GOOGLE_API_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        # Extract the model's text output
-        try:
-            return data["results"][0]["content"][0]["text"]
-        except (KeyError, IndexError):
-            return None
-        
+    api_url = settings.GOOGLE_API_URL
+    if not api_url.startswith("http"):
+        logger.error(f"[AgentRouter] Invalid GOOGLE_API_URL: {api_url}")
+        return ""
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(api_url, headers=headers, json=payload)
+            logger.info(f"[AgentRouter] Google API Response: {response.status_code}")
+
+            if response.status_code != 200:
+                logger.error(f"[AgentRouter] Non-200 response: {response.text}")
+                return ""
+
+            data = response.json()
+            logger.debug(f"[AgentRouter] Full Response JSON: {data}")
+
+            # Gemini v1beta returns under "candidates"
+            text = (
+                data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
+            )
+
+            if not text:
+                logger.warning("[AgentRouter] No text found in response.")
+                return ""
+
+            logger.info("[AgentRouter] Successfully got response from Gemini.")
+            return text
+
+    except httpx.RequestError as e:
+        logger.error(f"[AgentRouter] Network error: {e}")
+        return ""
+
+    except Exception as e:
+        logger.exception(f"[AgentRouter] Unexpected error: {e}")
+        return ""
 
 def handleLLMResponseText(data: str) -> str:
     """
